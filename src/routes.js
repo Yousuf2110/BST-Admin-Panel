@@ -6,6 +6,7 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 
 import Icon from "@mui/material/Icon";
+import DepositList from "layouts/depositList";
 
 const routes = [
   {
@@ -21,7 +22,7 @@ const routes = [
     name: "User List",
     key: "tables",
     icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
+    route: "/user-list",
     component: <Tables />,
   },
   {
@@ -29,16 +30,16 @@ const routes = [
     name: "Deposit List",
     key: "billing",
     icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
+    route: "/deposit-list",
+    component: <DepositList />,
   },
   {
     type: "collapse",
     name: "Withdraw List",
-    key: "profile",
+    key: "withdraw-list",
     icon: <Icon fontSize="small">person</Icon>,
     route: "/profile",
-    component: <Profile />,
+    component: <Tables />,
   },
   {
     type: "collapse",
@@ -48,14 +49,14 @@ const routes = [
     route: "/notifications",
     component: <Notifications />,
   },
-  {
-    type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Sign In",
+  //   key: "sign-in",
+  //   icon: <Icon fontSize="small">login</Icon>,
+  //   route: "/authentication/sign-in",
+  //   component: <SignIn />,
+  // },
 ];
 
 export default routes;

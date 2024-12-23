@@ -8,7 +8,7 @@ import MDButton from "components/MDButton";
 
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
-import logo from "assets/images/logo.png";
+import logo from "assets/images/logo-2.png";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 function Basic() {
