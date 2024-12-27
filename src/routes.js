@@ -7,6 +7,9 @@ import SignIn from "layouts/authentication/sign-in";
 
 import Icon from "@mui/material/Icon";
 import DepositList from "layouts/depositList";
+import AllUsers from "layouts/userList";
+import GeneratedPassword from "layouts/generatePassword";
+import WithDrawList from "layouts/withDrawList";
 
 const routes = [
   {
@@ -23,7 +26,7 @@ const routes = [
     key: "tables",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/user-list",
-    component: <Tables />,
+    component: <AllUsers />,
   },
   {
     type: "collapse",
@@ -38,8 +41,8 @@ const routes = [
     name: "Withdraw List",
     key: "withdraw-list",
     icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Tables />,
+    route: "/withdraw-list",
+    component: <WithDrawList />,
   },
   {
     type: "collapse",
@@ -49,14 +52,22 @@ const routes = [
     route: "/notifications",
     component: <Notifications />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Sign In",
-  //   key: "sign-in",
-  //   icon: <Icon fontSize="small">login</Icon>,
-  //   route: "/authentication/sign-in",
-  //   component: <SignIn />,
-  // },
+  {
+    type: "collapse",
+    name: "Generated Password ",
+    key: "Generated Password ",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/generated-password ",
+    component: <GeneratedPassword />,
+  },
+  {
+    type: "collapse",
+    name: "Sign In",
+    key: "sign-in",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/authentication/sign-in",
+    component: <GeneratedPassword />,
+  },
 ];
 
 export default routes;

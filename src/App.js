@@ -161,13 +161,12 @@ export default function App() {
               onMouseLeave={handleOnMouseLeave}
             />
             <Configurator />
-            {configsButton}
           </>
         )}
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -191,7 +190,7 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
       </Routes>
     </ThemeProvider>
   );

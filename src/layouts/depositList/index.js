@@ -27,7 +27,6 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
 
 // Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
 
 function DepositList() {
   const { columns, rows } = authorsTableData();

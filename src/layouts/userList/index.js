@@ -11,7 +11,7 @@ import DataTable from "examples/Tables/DataTable";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function Tables() {
+function AllUsers() {
   const token = localStorage.getItem("authToken");
   const [tableData, setTableData] = useState({
     columns: [
@@ -95,4 +95,4 @@ function Tables() {
   );
 }
 
-export default Tables;
+export default AllUsers;

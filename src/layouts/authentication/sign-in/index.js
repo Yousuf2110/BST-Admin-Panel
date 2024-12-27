@@ -1,7 +1,10 @@
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Card from "@mui/material/Card";
-
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
@@ -12,8 +15,63 @@ import logo from "assets/images/logo-2.png";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 function Basic() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!username || !password) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "https://ecosphere-pakistan-backend.co-m.pk/api/login",
+        {
+          email: username,
+          password: password,
+        },
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        }
+      );
+
+      if (response.status === 200) {
+        const token = response.data.token;
+        if (token) {
+          localStorage.setItem("authToken", token);
+        }
+        toast.success("Login Successful! Redirecting to dashboard...");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 2000);
+      } else {
+        toast.error(response.data.message || "Login failed. Unexpected response from server.");
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 400) {
+          toast.error("Invalid email or password.");
+        } else if (err.response.status === 500) {
+          toast.error("Internal Server Error. Please try again later.");
+        } else {
+          toast.error(err.response.data.message || "An error occurred. Please try again.");
+        }
+      } else if (err.request) {
+        toast.error("No response from server. Please check your internet connection.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+      console.error(err);
+      toast.error(err);
+    }
+  };
+
   return (
     <BasicLayout image={bgImage}>
+      <ToastContainer />
       <Card>
         <MDBox
           variant="gradient"
@@ -37,19 +95,31 @@ function Basic() {
           />
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
+          <form onSubmit={handleLogin}>
             <MDBox mb={2}>
-              <MDInput type="username" label="User Name" fullWidth />
+              <MDInput
+                type="text"
+                label="User Name"
+                fullWidth
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+              <MDInput
+                type="password"
+                label="Password"
+                fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
+              <MDButton variant="gradient" color="info" fullWidth type="submit">
                 Login
               </MDButton>
             </MDBox>
-          </MDBox>
+          </form>
         </MDBox>
       </Card>
     </BasicLayout>
