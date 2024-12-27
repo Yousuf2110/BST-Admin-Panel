@@ -14,22 +14,29 @@ function WithDrawList() {
     columns: [
       { Header: "ID", accessor: "id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
-      { Header: "Amount ($)", accessor: "amount", align: "center" },
+      { Header: "Amount", accessor: "amount", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
-      { Header: "Created At", accessor: "created_at", align: "center" },
-      { Header: "Updated At", accessor: "updated_at", align: "center" },
+      { Header: "Requested", accessor: "created_at", align: "center" },
+      { Header: "Actions", accessor: "actions", align: "center" },
     ],
     rows: [],
   });
 
   const formatDate = (dateString) => {
     try {
-      // Remove timezone offset and milliseconds if present
       const cleanDate = dateString.split(".")[0].replace("T", " ");
       return cleanDate || "N/A";
     } catch (error) {
       return "N/A";
     }
+  };
+
+  const handleApprove = (id) => {
+    console.log("Approved withdrawal with ID:", id);
+  };
+
+  const handleReject = (id) => {
+    console.log("Rejected withdrawal with ID:", id);
   };
 
   useEffect(() => {
@@ -44,8 +51,6 @@ function WithDrawList() {
             },
           }
         );
-
-        console.log("xx-response", response);
 
         const mappedRows = response.data?.withdraw.map((item) => ({
           id: item.id || "N/A",
@@ -62,9 +67,14 @@ function WithDrawList() {
           ),
           created_at: formatDate(item.created_at),
           updated_at: formatDate(item.updated_at),
+          actions:
+            item.status === "pending" ? (
+              <div>
+                <button onClick={() => handleApprove(item.id)}>Approve</button>
+                <button onClick={() => handleReject(item.id)}>Reject</button>
+              </div>
+            ) : null,
         }));
-
-        console.log("xx-mappedRows", mappedRows);
 
         setTableData((prevState) => ({
           ...prevState,

@@ -20,7 +20,31 @@ function ViewRequestPins() {
     { Header: "Pin", accessor: "pin", align: "center" },
     { Header: "Status", accessor: "status", align: "center" },
     { Header: "Requested", accessor: "created_at", align: "center" },
+    { Header: "Action", accessor: "action", align: "center" },
   ];
+
+  const handleApprove = (pinId) => {
+    axios
+      .post(
+        `https://ecosphere-pakistan-backend.co-m.pk/api/approve-withdraw/${pinId}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        alert("Pin approved successfully!");
+        setRows((prevRows) =>
+          prevRows.map((row) => (row.id === pinId ? { ...row, status: "approved" } : row))
+        );
+      })
+      .catch((error) => {
+        console.error("Error approving pin:", error);
+      });
+  };
 
   useEffect(() => {
     axios
@@ -33,7 +57,9 @@ function ViewRequestPins() {
       .then((response) => {
         const fetchedData = response.data.pins;
 
-        const formattedRows = fetchedData.map((item) => ({
+        const filteredData = fetchedData.filter((item) => item.status !== "used");
+
+        const formattedRows = filteredData.map((item) => ({
           id: item.id,
           user_email: item.user_email,
           pin: item.pin,
@@ -48,13 +74,28 @@ function ViewRequestPins() {
             </span>
           ),
           created_at: new Date(item.created_at).toLocaleString(),
+          action: (
+            <button
+              onClick={() => handleApprove(item.id)}
+              style={{
+                padding: "5px 10px",
+                backgroundColor: "green",
+                color: "white",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Approve
+            </button>
+          ),
         }));
+
         setRows(formattedRows);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, []);
+  }, [token]);
 
   return (
     <DashboardLayout>

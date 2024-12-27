@@ -6,7 +6,6 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 
 import Icon from "@mui/material/Icon";
-import DepositList from "layouts/depositList";
 import AllUsers from "layouts/userList";
 import GeneratedPassword from "layouts/generatePassword";
 import WithDrawList from "layouts/withDrawList";
@@ -32,14 +31,6 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Deposit List",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/deposit-list",
-    component: <DepositList />,
-  },
-  {
-    type: "collapse",
     name: "Withdraw List",
     key: "withdraw-list",
     icon: <Icon fontSize="small">person</Icon>,
@@ -48,18 +39,18 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "View Requested Pins",
-    key: "view-requested-pins",
+    name: "All Pins List",
+    key: "all-pins-lists",
     icon: <Icon fontSize="small">person</Icon>,
-    route: "/view-requested-pins",
+    route: "/all-pins-lists",
     component: <ViewRequestPins />,
   },
   {
     type: "collapse",
-    name: "All User Pins",
-    key: "all-user-pins",
+    name: "Requested Pins List",
+    key: "requested-pins-list",
     icon: <Icon fontSize="small">person</Icon>,
-    route: "/all-user-pins",
+    route: "/requested-pins-list",
     component: <AllUsersPins />,
   },
   {
