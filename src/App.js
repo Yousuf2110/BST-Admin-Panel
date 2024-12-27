@@ -50,7 +50,7 @@ import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
 // Images
-import brandWhite from "assets/images/logo-ct.png";
+import brandWhite from "assets/images/logo-2.png";
 import brandDark from "assets/images/logo-ct-dark.png";
 
 export default function App() {
@@ -155,7 +155,15 @@ export default function App() {
             <Sidenav
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="Material Dashboard 2"
+              brandName={
+                <>
+                  Qazi M Yousuf
+                  <br />
+                  dony96538@gmail.com
+                  <br />
+                  030483426
+                </>
+              }
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
@@ -166,7 +174,7 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -178,11 +186,20 @@ export default function App() {
           <Sidenav
             color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="Material Dashboard 2"
+            brandName={
+              <>
+                Qazi M Yousuf
+                <br />
+                dony96538@gmail.com
+                <br />
+                030483426
+              </>
+            }
             routes={routes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
+
           <Configurator />
           {configsButton}
         </>
@@ -190,7 +207,7 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </ThemeProvider>
   );

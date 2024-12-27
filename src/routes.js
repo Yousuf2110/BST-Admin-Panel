@@ -10,6 +10,8 @@ import DepositList from "layouts/depositList";
 import AllUsers from "layouts/userList";
 import GeneratedPassword from "layouts/generatePassword";
 import WithDrawList from "layouts/withDrawList";
+import ViewRequestPins from "layouts/viewRequestPins";
+import AllUsersPins from "layouts/allUsersPins";
 
 const routes = [
   {
@@ -46,6 +48,22 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "View Requested Pins",
+    key: "view-requested-pins",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/view-requested-pins",
+    component: <ViewRequestPins />,
+  },
+  {
+    type: "collapse",
+    name: "All User Pins",
+    key: "all-user-pins",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/all-user-pins",
+    component: <AllUsersPins />,
+  },
+  {
+    type: "collapse",
     name: "Notifications",
     key: "notifications",
     icon: <Icon fontSize="small">notifications</Icon>,
@@ -66,7 +84,7 @@ const routes = [
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
-    component: <GeneratedPassword />,
+    component: <SignIn />,
   },
 ];
 
