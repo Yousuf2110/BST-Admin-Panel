@@ -13,11 +13,13 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 import logo from "assets/images/logo-2.png";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { useAuth } from "context/AuthContext";
 
 function Basic() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,22 +29,18 @@ function Basic() {
     }
 
     try {
-      const response = await axios.post(
-        "https://ecosphere-pakistan-backend.co-m.pk/api/login",
-        {
-          email: username,
-          password: password,
-        },
-        {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        }
-      );
+      const response = await axios.post("https://ecosphere-pakistan-backend.co-m.pk/api/login", {
+        email: username,
+        password: password,
+      });
 
       if (response.status === 200) {
         const token = response.data.token;
         if (token) {
           localStorage.setItem("authToken", token);
+          login(token);
         }
+        localStorage.setItem("userData", JSON.stringify(response.data));
         toast.success("Login Successful! Redirecting to dashboard...");
         setTimeout(() => {
           navigate("/dashboard");
@@ -65,7 +63,7 @@ function Basic() {
         toast.error("Something went wrong. Please try again.");
       }
       console.error(err);
-      toast.error(err);
+      toast.error(err.message || "An error occurred.");
     }
   };
 

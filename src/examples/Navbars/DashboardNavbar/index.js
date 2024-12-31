@@ -129,6 +129,31 @@ function DashboardNavbar({ absolute, light, isMini }) {
       color="inherit"
       sx={(theme) => navbar(theme, { transparentNavbar, absolute, light, darkMode })}
     >
+      {isMini ? null : (
+        <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
+          <MDBox color={light ? "white" : "inherit"}>
+            <Link to="/authentication/sign-in/basic"></Link>
+            <IconButton
+              size="large"
+              disableRipple
+              color="inherit"
+              sx={navbarMobileMenu}
+              onClick={handleMiniSidenav}
+            >
+              <Icon
+                sx={{
+                  ...iconsStyle,
+                  fontSize: "6.5rem",
+                }}
+              >
+                {miniSidenav ? "menu_open" : "menu"}
+              </Icon>
+            </IconButton>
+
+            {renderMenu()}
+          </MDBox>
+        </MDBox>
+      )}
       <Toolbar sx={(theme) => navbarContainer(theme)}>
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
