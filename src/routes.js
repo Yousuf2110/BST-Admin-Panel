@@ -12,6 +12,7 @@ import WithDrawList from "layouts/withDrawList";
 import ViewRequestPins from "layouts/viewRequestPins";
 import AllUsersPins from "layouts/allUsersPins";
 import ApprovePasswordRequest from "layouts/approvePasswordRequest";
+import CompanyAccountInfo from "layouts/companyAccountInfo";
 
 const routes = [
   {
@@ -61,6 +62,14 @@ const routes = [
     icon: <Icon fontSize="small">person</Icon>,
     route: "/requested-pins-list",
     component: <AllUsersPins />,
+  },
+  {
+    type: "collapse",
+    name: "Company Account Info",
+    key: "company-account-info",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/company-account-info",
+    component: <CompanyAccountInfo />,
   },
   {
     type: "collapse",
