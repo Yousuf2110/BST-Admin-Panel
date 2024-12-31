@@ -16,6 +16,8 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
+import PropTypes from "prop-types";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function AllUsersPins() {
   const [rows, setRows] = useState([]);
@@ -23,6 +25,7 @@ function AllUsersPins() {
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
   const [selectedPin, setSelectedPin] = useState(null);
   const [pinCount, setPinCount] = useState("");
+  const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("authToken");
 
   const columns = [
@@ -34,10 +37,38 @@ function AllUsersPins() {
     { Header: "User Email", accessor: "user_email", align: "center" },
     { Header: "Status", accessor: "status", align: "center" },
     { Header: "Created At", accessor: "created_at", align: "center" },
-    { Header: "Action", accessor: "action", align: "center" },
+    {
+      Header: "Actions",
+      accessor: "actions",
+      align: "center",
+      Cell: ({ row }) => {
+        const status = row.original.status?.props?.children;
+        return status === "pending" ? (
+          <>
+            <MDButton
+              color="success"
+              onClick={() => handleApproveClick(row.original)}
+              size="small"
+              style={{ fontSize: "12px", padding: "6px 12px", marginRight: "8px" }}
+            >
+              Approve
+            </MDButton>
+            <MDButton
+              color="error"
+              onClick={() => handleRejectClick(row.original)}
+              size="small"
+              style={{ fontSize: "12px", padding: "6px 12px" }}
+            >
+              Reject
+            </MDButton>
+          </>
+        ) : null;
+      },
+    },
   ];
 
   const fetchPins = () => {
+    setLoading(true);
     axios
       .get("https://ecosphere-pakistan-backend.co-m.pk/api/pins", {
         headers: {
@@ -47,7 +78,6 @@ function AllUsersPins() {
       })
       .then((response) => {
         const fetchedData = response.data.pins;
-
         const formattedRows = fetchedData.map((item) => ({
           id: item?.id || "",
           account_number: item?.account_number || "",
@@ -65,7 +95,7 @@ function AllUsersPins() {
                 color:
                   item?.status === "pending"
                     ? "orange"
-                    : item?.status === "approved"
+                    : item?.status === "approve"
                     ? "green"
                     : "red",
                 fontWeight: "bold",
@@ -75,33 +105,14 @@ function AllUsersPins() {
             </span>
           ),
           created_at: item?.created_at ? new Date(item.created_at).toLocaleString() : "N/A",
-          action:
-            item?.status === "pending" ? (
-              <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-                <MDButton
-                  variant="contained"
-                  color="success"
-                  size="small"
-                  onClick={() => handleApproveClick(item)}
-                >
-                  Approve
-                </MDButton>
-                <MDButton
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  onClick={() => handleRejectClick(item)}
-                >
-                  Reject
-                </MDButton>
-              </div>
-            ) : null,
         }));
         setRows(formattedRows);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         toast.error("Failed to fetch pins!");
+        setLoading(false);
       });
   };
 
@@ -130,6 +141,7 @@ function AllUsersPins() {
     const payload = {
       email: selectedPin?.user_email,
       pin_count: pinCount,
+      request_id: selectedPin?.id,
     };
 
     axios
@@ -141,10 +153,8 @@ function AllUsersPins() {
       })
       .then((response) => {
         const message = response.data.message;
-
-        if (message === "PINs approved and created successfully") {
+        if (response?.data) {
           toast.success("Pin approved successfully!");
-
           setRows((prevRows) =>
             prevRows.map((row) =>
               row.id === selectedPin?.id
@@ -158,7 +168,6 @@ function AllUsersPins() {
         } else {
           toast.error("Unexpected response from server!");
         }
-
         handleDialogClose();
       })
       .catch((error) => {
@@ -170,7 +179,7 @@ function AllUsersPins() {
   const handleRejectSubmit = () => {
     axios
       .put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/reject-pin/${selectedPin?.id}`,
+        `https://ecosphere-pakistan-backend.co-m.pk/api/reset-password/${selectedPin?.id}`,
         {},
         {
           headers: {
@@ -180,13 +189,13 @@ function AllUsersPins() {
         }
       )
       .then(() => {
-        toast.success("Pin rejected successfully!");
+        toast.success("New Password generated successfully!");
         handleRejectDialogClose();
         fetchPins();
       })
       .catch((error) => {
         console.error("Error rejecting pin:", error);
-        toast.error("Failed to reject pin!");
+        toast.error("Failed to generate new password!");
       });
   };
 
@@ -216,13 +225,23 @@ function AllUsersPins() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={{ columns, rows }}
-                  isSorted={true}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                {loading ? (
+                  <Grid container justifyContent="center" alignItems="center">
+                    <CircularProgress />
+                  </Grid>
+                ) : rows.length === 0 ? (
+                  <MDBox display="flex" justifyContent="center" alignItems="center" mt={5}>
+                    <MDTypography variant="h6">No data available</MDTypography>
+                  </MDBox>
+                ) : (
+                  <DataTable
+                    table={{ columns, rows }}
+                    isSorted={true}
+                    entriesPerPage={false}
+                    showTotalEntries={false}
+                    noEndBorder
+                  />
+                )}
               </MDBox>
             </Card>
           </Grid>
@@ -269,5 +288,15 @@ function AllUsersPins() {
     </DashboardLayout>
   );
 }
+
+AllUsersPins.propTypes = {
+  row: PropTypes.shape({
+    original: PropTypes.shape({
+      id: PropTypes.string,
+      status: PropTypes.string,
+      user_email: PropTypes.string,
+    }),
+  }),
+};
 
 export default AllUsersPins;

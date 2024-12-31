@@ -7,12 +7,12 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function ViewRequestPins() {
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("authToken");
-
-  console.log("token", token);
 
   const columns = [
     { Header: "Id", accessor: "id", align: "center" },
@@ -20,33 +20,10 @@ function ViewRequestPins() {
     { Header: "Pin", accessor: "pin", align: "center" },
     { Header: "Status", accessor: "status", align: "center" },
     { Header: "Requested", accessor: "created_at", align: "center" },
-    { Header: "Action", accessor: "action", align: "center" },
   ];
 
-  const handleApprove = (pinId) => {
-    axios
-      .post(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/approve-withdraw/${pinId}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((response) => {
-        alert("Pin approved successfully!");
-        setRows((prevRows) =>
-          prevRows.map((row) => (row.id === pinId ? { ...row, status: "approved" } : row))
-        );
-      })
-      .catch((error) => {
-        console.error("Error approving pin:", error);
-      });
-  };
-
   useEffect(() => {
+    setLoading(true);
     axios
       .get("https://ecosphere-pakistan-backend.co-m.pk/api/all-users-pins", {
         headers: {
@@ -74,26 +51,14 @@ function ViewRequestPins() {
             </span>
           ),
           created_at: new Date(item.created_at).toLocaleString(),
-          action: (
-            <button
-              onClick={() => handleApprove(item.id)}
-              style={{
-                padding: "5px 10px",
-                backgroundColor: "green",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Approve
-            </button>
-          ),
         }));
 
         setRows(formattedRows);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
+        setLoading(false);
       });
   }, [token]);
 
@@ -119,13 +84,23 @@ function ViewRequestPins() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={{ columns, rows }}
-                  isSorted={true}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                {loading ? (
+                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                    <CircularProgress />
+                  </div>
+                ) : rows.length === 0 ? (
+                  <MDTypography variant="h6" color="textSecondary" align="center">
+                    No data available
+                  </MDTypography>
+                ) : (
+                  <DataTable
+                    table={{ columns, rows }}
+                    isSorted={true}
+                    entriesPerPage={false}
+                    showTotalEntries={false}
+                    noEndBorder
+                  />
+                )}
               </MDBox>
             </Card>
           </Grid>

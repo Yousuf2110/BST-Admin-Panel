@@ -4,9 +4,9 @@ import Grid from "@mui/material/Grid";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function Dashboard() {
   const [data, setData] = useState({
@@ -14,7 +14,12 @@ function Dashboard() {
     reward_income: 0,
     total_income: 0,
     available_pins: 0,
+    income_2stars: "---",
+    income_gt_2stars: "---",
+    total_pins: "---",
   });
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -32,8 +37,10 @@ function Dashboard() {
         );
 
         setData(response.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false);
       }
     };
 
@@ -44,37 +51,41 @@ function Dashboard() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={6}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Total Income"
-                count={`Rs ${data.income_2stars}/-`}
-              />
-            </MDBox>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6} lg={6}>
+              <MDBox mb={1.5}>
+                <ComplexStatisticsCard
+                  icon="leaderboard"
+                  title="Total Income"
+                  count={`Rs ${data.income_2stars}/-`}
+                />
+              </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={6}>
+              <MDBox mb={1.5}>
+                <ComplexStatisticsCard
+                  color="primary"
+                  icon={<MonetizationOnIcon />}
+                  title="Total Income (2+)"
+                  count={`Rs ${data.income_gt_2stars}/-`}
+                />
+              </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={6}>
+              <MDBox mb={1.5}>
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon="confirmation_number"
+                  title="Total Pins"
+                  count={data.total_pins}
+                />
+              </MDBox>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="primary"
-                icon={<MonetizationOnIcon />}
-                title="Total Income (2+)"
-                count={`Rs ${data.income_gt_2stars}/-`}
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon="confirmation_number"
-                title="Total Pins"
-                count={data.total_pins}
-              />
-            </MDBox>
-          </Grid>
-        </Grid>
+        )}
       </MDBox>
     </DashboardLayout>
   );

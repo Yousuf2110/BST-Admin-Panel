@@ -1,13 +1,11 @@
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
-
+import CircularProgress from "@mui/material/CircularProgress";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -23,6 +21,8 @@ function AllUsers() {
     ],
     rows: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [empty, setEmpty] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,25 +37,31 @@ function AllUsers() {
         const data = response.data;
         const pins = data.pins || [];
 
-        const rows = pins.map((pin) => ({
-          id: pin.id,
-          name: pin.name,
-          email: pin.email,
-          mobile: pin.mobile,
-          role: pin.role,
-        }));
+        if (pins.length === 0) {
+          setEmpty(true);
+        } else {
+          const rows = pins.map((pin) => ({
+            id: pin.id,
+            name: pin.name,
+            email: pin.email,
+            mobile: pin.mobile,
+            role: pin.role,
+          }));
 
-        setTableData((prevState) => ({
-          ...prevState,
-          rows,
-        }));
+          setTableData((prevState) => ({
+            ...prevState,
+            rows,
+          }));
+        }
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [token]);
 
   return (
     <DashboardLayout>
@@ -79,13 +85,25 @@ function AllUsers() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={tableData}
-                  isSorted={true}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                {loading ? (
+                  <Grid container justifyContent="center">
+                    <CircularProgress />
+                  </Grid>
+                ) : empty ? (
+                  <MDBox textAlign="center" p={2}>
+                    <MDTypography variant="h6" color="textSecondary">
+                      No users found.
+                    </MDTypography>
+                  </MDBox>
+                ) : (
+                  <DataTable
+                    table={tableData}
+                    isSorted={true}
+                    entriesPerPage={false}
+                    showTotalEntries={false}
+                    noEndBorder
+                  />
+                )}
               </MDBox>
             </Card>
           </Grid>

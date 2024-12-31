@@ -5,6 +5,7 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -21,6 +22,8 @@ function WithDrawList() {
     ],
     rows: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [empty, setEmpty] = useState(false);
 
   const formatDate = (dateString) => {
     try {
@@ -76,12 +79,18 @@ function WithDrawList() {
             ) : null,
         }));
 
-        setTableData((prevState) => ({
-          ...prevState,
-          rows: mappedRows,
-        }));
+        if (mappedRows.length === 0) {
+          setEmpty(true); // Set empty state if no withdrawals
+        } else {
+          setTableData((prevState) => ({
+            ...prevState,
+            rows: mappedRows,
+          }));
+        }
+        setLoading(false); // Data is loaded
       } catch (error) {
         console.error("Error fetching withdrawals:", error);
+        setLoading(false); // Stop loading in case of error
       }
     };
 
@@ -110,13 +119,25 @@ function WithDrawList() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={tableData}
-                  isSorted={true}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                {loading ? (
+                  <Grid container justifyContent="center">
+                    <CircularProgress /> {/* Loader while data is loading */}
+                  </Grid>
+                ) : empty ? (
+                  <MDBox textAlign="center" p={2}>
+                    <MDTypography variant="h6" color="textSecondary">
+                      No withdrawals found.
+                    </MDTypography>
+                  </MDBox>
+                ) : (
+                  <DataTable
+                    table={tableData}
+                    isSorted={true}
+                    entriesPerPage={false}
+                    showTotalEntries={false}
+                    noEndBorder
+                  />
+                )}
               </MDBox>
             </Card>
           </Grid>
