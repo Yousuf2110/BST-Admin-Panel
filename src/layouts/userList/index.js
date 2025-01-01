@@ -89,17 +89,19 @@ function AllUsers() {
             mobile: user.mobile,
             bank: user.bank,
             role: user.role,
-            actions: (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleEditClick(user)}
-                style={{ color: "white" }}
-              >
-                Edit
-              </Button>
-            ),
+            actions:
+              user.role !== "admin" ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleEditClick(user)}
+                  style={{ color: "white" }}
+                >
+                  Edit
+                </Button>
+              ) : null,
           }));
+
           setTableDataLte2((prevState) => ({
             ...prevState,
             rows: rowsLte2,
@@ -117,11 +119,17 @@ function AllUsers() {
             mobile: user.mobile,
             bank: user.bank,
             role: user.role,
-            actions: (
-              <Button variant="contained" color="primary" onClick={() => handleEditClick(user)}>
-                Edit
-              </Button>
-            ),
+            actions:
+              user.role !== "admin" ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  style={{ color: "white" }}
+                  onClick={() => handleEditClick(user)}
+                >
+                  Edit
+                </Button>
+              ) : null,
           }));
           setTableDataGt2((prevState) => ({
             ...prevState,
@@ -140,15 +148,17 @@ function AllUsers() {
   }, [token]);
 
   const handleEditClick = (user) => {
-    setSelectedUser(user);
-    setFormData({
-      name: user.name || "",
-      email: user.email || "",
-      mobile: user.mobile || "",
-      account_title: user.account_title || "",
-      bank: user.bank || "",
-    });
-    setOpenEditPopup(true);
+    if (user.role !== "admin") {
+      setSelectedUser(user);
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        mobile: user.mobile || "",
+        account_title: user.account_title || "",
+        bank: user.bank || "",
+      });
+      setOpenEditPopup(true);
+    }
   };
 
   const handleFormChange = (e) => {

@@ -42,8 +42,8 @@ function AllUsersPins() {
       accessor: "actions",
       align: "center",
       Cell: ({ row }) => {
-        const status = row.original.status?.props?.children;
-        return status === "pending" ? (
+        const state = row.original.status?.props?.children;
+        return state === "pending" ? (
           <>
             <MDButton
               color="success"
@@ -101,7 +101,7 @@ function AllUsersPins() {
                 fontWeight: "bold",
               }}
             >
-              {item?.status || "N/A"}
+              {(item?.status || "N/A").toUpperCase()}
             </span>
           ),
           created_at: item?.created_at ? new Date(item.created_at).toLocaleString() : "N/A",
@@ -179,7 +179,7 @@ function AllUsersPins() {
   const handleRejectSubmit = () => {
     axios
       .put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/reset-password/${selectedPin?.id}`,
+        `https://ecosphere-pakistan-backend.co-m.pk/api/reject-pin/${selectedPin?.id}`,
         {},
         {
           headers: {
@@ -189,13 +189,13 @@ function AllUsersPins() {
         }
       )
       .then(() => {
-        toast.success("New Password generated successfully!");
+        toast.success("New Pin Request Rejected successfully!");
         handleRejectDialogClose();
         fetchPins();
       })
       .catch((error) => {
         console.error("Error rejecting pin:", error);
-        toast.error("Failed to generate new password!");
+        toast.error("New Pin Request Rejected failed!");
       });
   };
 

@@ -16,6 +16,7 @@ function WithDrawList() {
     columns: [
       { Header: "ID", accessor: "id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
+      { Header: "Mobile", accessor: "mobile", align: "center" }, // New column for mobile
       { Header: "Amount", accessor: "amount", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
       { Header: "Requested", accessor: "created_at", align: "center" },
@@ -28,6 +29,7 @@ function WithDrawList() {
     columns: [
       { Header: "ID", accessor: "id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
+      { Header: "Mobile", accessor: "mobile", align: "center" },
       { Header: "Amount", accessor: "amount", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
       { Header: "Requested", accessor: "created_at", align: "center" },
@@ -110,7 +112,8 @@ function WithDrawList() {
         } else {
           const rowsGt2 = withdrawalsGt2.map((item) => ({
             id: item.id || "N/A",
-            user_email: item.user_email || "N/A",
+            user_email: item.user.email || "N/A",
+            mobile: item.user.mobile || "N/A", // Added mobile
             amount: parseFloat(item.amount).toFixed(2) || "0.00",
             status: (
               <MDTypography
@@ -155,7 +158,8 @@ function WithDrawList() {
         } else {
           const rowsLte2 = withdrawalsLte2.map((item) => ({
             id: item.id || "N/A",
-            user_email: item.user_email || "N/A",
+            user_email: item.user.email || "N/A",
+            mobile: item.user.mobile || "N/A", // Added mobile
             amount: parseFloat(item.amount).toFixed(2) || "0.00",
             status: (
               <MDTypography
@@ -172,7 +176,7 @@ function WithDrawList() {
                 <div style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}>
                   <button
                     style={{
-                      backgroundColor: "#4CAF50", // Green
+                      backgroundColor: "#4CAF50",
                       color: "white",
                       border: "none",
                       padding: "10px 20px",
@@ -180,7 +184,7 @@ function WithDrawList() {
                       cursor: "pointer",
                       borderRadius: "5px",
                       transition: "background-color 0.3s ease",
-                      marginRight: "10px", // Adds space between the buttons
+                      marginRight: "10px",
                     }}
                     onClick={() => handleApprove(item.id)}
                   >

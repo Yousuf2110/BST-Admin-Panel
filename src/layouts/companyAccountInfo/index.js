@@ -90,10 +90,10 @@ function CompanyAccountInfo() {
         >
           <MDBox textAlign="center" mb={3}>
             <MDTypography variant="h4" fontWeight="bold" color="textPrimary" gutterBottom>
-              Add Payment Method
+              Change Payment Method
             </MDTypography>
             <MDTypography variant="body2" color="textSecondary">
-              Add your account information to set up a payment method.
+              Change your account information to set up a payment method.
             </MDTypography>
           </MDBox>
 
@@ -150,7 +150,7 @@ function CompanyAccountInfo() {
                       },
                     }}
                   >
-                    {isLoading ? "Submitting..." : "Add Payment Method"}
+                    {isLoading ? "Submitting..." : "Change Payment Method"}
                   </Button>
                 </MDBox>
               </Grid>

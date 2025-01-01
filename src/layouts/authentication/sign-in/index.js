@@ -24,7 +24,10 @@ function Basic() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!username || !password) {
-      toast.error("Please enter both email and password.");
+      // Using toastId to ensure only one error toast is shown at a time
+      toast.error("Please enter both email and password.", {
+        toastId: "error-empty-fields", // Unique toast ID
+      });
       return;
     }
 
@@ -36,40 +39,76 @@ function Basic() {
 
       if (response.status === 200) {
         const token = response.data.token;
+        const userRole = response.data?.info?.role; // Assuming the role is returned in the response
+
+        // If the role is admin, proceed with login
+        if (userRole !== "admin") {
+          toast.error("You do not have permission to log in.", {
+            toastId: "error-no-permission", // Unique toast ID
+          });
+          return;
+        }
+
         if (token) {
           localStorage.setItem("authToken", token);
           login(token);
         }
+
         localStorage.setItem("userData", JSON.stringify(response.data));
-        toast.success("Login Successful!");
+        toast.success("Login Successful!", {
+          toastId: "success-login", // Unique toast ID
+        });
         setTimeout(() => {
           navigate("/dashboard");
         }, 2000);
       } else {
-        toast.error(response.data.message || "Login failed. Unexpected response from server.");
+        toast.error(response.data.message || "Login failed. Unexpected response from server.", {
+          toastId: "error-server-response", // Unique toast ID
+        });
       }
     } catch (err) {
+      // Handle error cases
       if (err.response) {
         if (err.response.status === 400) {
-          toast.error("Invalid email or password.");
+          toast.error("Invalid email or password.", {
+            toastId: "error-invalid-credentials", // Unique toast ID
+          });
         } else if (err.response.status === 500) {
-          toast.error("Internal Server Error. Please try again later.");
+          toast.error("Internal Server Error. Please try again later.", {
+            toastId: "error-server-error", // Unique toast ID
+          });
         } else {
-          toast.error(err.response.data.message || "An error occurred. Please try again.");
+          toast.error(err.response.data.message || "An error occurred. Please try again.", {
+            toastId: "error-general", // Unique toast ID
+          });
         }
       } else if (err.request) {
-        toast.error("No response from server. Please check your internet connection.");
+        toast.error("No response from server. Please check your internet connection.", {
+          toastId: "error-no-response", // Unique toast ID
+        });
       } else {
-        toast.error("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.", {
+          toastId: "error-unknown", // Unique toast ID
+        });
       }
       console.error(err);
-      toast.error(err.message || "An error occurred.");
     }
   };
 
   return (
     <BasicLayout image={bgImage}>
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000} // This makes each toast disappear after 3 seconds
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        limit={1} // Ensures only one toast is shown at a time
+      />
       <Card>
         <MDBox
           variant="gradient"

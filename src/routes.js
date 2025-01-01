@@ -1,13 +1,8 @@
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
 import Notifications from "layouts/notifications";
-import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
 
 import Icon from "@mui/material/Icon";
 import AllUsers from "layouts/userList";
-import GeneratedPassword from "layouts/generatePassword";
 import WithDrawList from "layouts/withDrawList";
 import ViewRequestPins from "layouts/viewRequestPins";
 import AllUsersPins from "layouts/allUsersPins";
@@ -26,7 +21,7 @@ const routes = [
   {
     type: "collapse",
     name: "User List",
-    key: "tables",
+    key: "user-list",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/user-list",
     component: <AllUsers />,

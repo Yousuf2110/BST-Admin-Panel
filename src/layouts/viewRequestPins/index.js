@@ -43,11 +43,13 @@ function ViewRequestPins() {
           status: (
             <span
               style={{
-                color: item.status === "unused" ? "red" : "green",
+                color: item.status === "unused" ? "green" : "red", // Green for "unused", red for others
                 fontWeight: "bold",
+                textTransform: "uppercase", // Ensures the status is in uppercase
               }}
             >
-              {item.status}
+              {item.status === "unused" ? "UNREAD" : item.status}{" "}
+              {/* Display "UNREAD" for unused */}
             </span>
           ),
           created_at: new Date(item.created_at).toLocaleString(),
