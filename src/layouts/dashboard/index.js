@@ -60,7 +60,7 @@ function Dashboard() {
                 <ComplexStatisticsCard
                   icon="leaderboard"
                   title="Total Income"
-                  count={`Rs ${data.income_2stars}/-`}
+                  count={`Rs ${data.incomeLt2stars}/-`}
                 />
               </MDBox>
             </Grid>
