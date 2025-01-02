@@ -26,6 +26,7 @@ import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import Link from "@mui/material/Link";
 import Icon from "@mui/material/Icon";
+import { styled } from "@mui/material/styles";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -46,6 +47,7 @@ import {
   setTransparentSidenav,
   setWhiteSidenav,
 } from "context";
+import { useAuth } from "context/AuthContext";
 
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
@@ -53,6 +55,12 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
   const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
+
+  const ScrollableContainer = styled("div")({
+    overflowY: "auto",
+    paddingBottom: "35px",
+  });
 
   let textColor = "white";
 
@@ -141,60 +149,66 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     return returnValue;
   });
 
-  return (
+  return isAuthenticated ? (
     <SidenavRoot
       {...rest}
       variant="permanent"
       ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
     >
-      <MDBox pt={3} pb={1} px={4} textAlign="center">
-        <MDBox
-          display={{ xs: "block", xl: "none" }}
-          position="absolute"
-          top={0}
-          right={0}
-          p={1.625}
-          onClick={closeSidenav}
-          sx={{ cursor: "pointer" }}
-        >
-          <MDTypography variant="h6" color="secondary">
-            <Icon sx={{ fontWeight: "bold" }}>close</Icon>
-          </MDTypography>
-        </MDBox>
-        <MDBox component={NavLink} to="/" display="flex" alignItems="center">
+      <ScrollableContainer>
+        <MDBox pt={3} pb={1} px={4} textAlign="center">
           <MDBox
-            width={!brandName && "100%"}
-            sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
+            display={{ xs: "block", xl: "none" }}
+            position="absolute"
+            top={0}
+            right={0}
+            p={1.625}
+            onClick={closeSidenav}
+            sx={{ cursor: "pointer" }}
           >
-            {brand && <MDBox component="img" src={brand} alt="Brand" width="5rem" />}
-
-            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
-              {brandName}
+            <MDTypography variant="h6" color="secondary">
+              <Icon sx={{ fontWeight: "bold" }}>close</Icon>
             </MDTypography>
           </MDBox>
+          <MDBox component={NavLink} to="/" display="flex" alignItems="center">
+            <MDBox
+              width={!brandName && "100%"}
+              sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
+            >
+              {brand && <MDBox component="img" src={brand} alt="Brand" width="5rem" />}
+
+              <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
+                {brandName}
+              </MDTypography>
+            </MDBox>
+          </MDBox>
         </MDBox>
-      </MDBox>
-      <Divider
-        light={
-          (!darkMode && !whiteSidenav && !transparentSidenav) ||
-          (darkMode && !transparentSidenav && whiteSidenav)
-        }
-      />
-      <List>{renderRoutes}</List>
-      <MDBox p={2} mt="auto">
-        <MDButton
-          onClick={() => navigate("/authentication/sign-in")}
-          variant="gradient"
-          color={sidenavColor}
-          fullWidth
-        >
-          Log Out
-        </MDButton>
-      </MDBox>
+        <Divider
+          light={
+            (!darkMode && !whiteSidenav && !transparentSidenav) ||
+            (darkMode && !transparentSidenav && whiteSidenav)
+          }
+        />
+        <List>{renderRoutes}</List>
+        <MDBox p={2}>
+          <MDButton
+            onClick={() => {
+              logout();
+              navigate("/authentication/sign-in");
+            }}
+            variant="gradient"
+            color={sidenavColor}
+            fullWidth
+          >
+            Log Out
+          </MDButton>
+        </MDBox>
+      </ScrollableContainer>
     </SidenavRoot>
-  );
+  ) : null;
 }
 
+// Setting default values for the props of Sidenav
 Sidenav.defaultProps = {
   color: "info",
   brand: "",

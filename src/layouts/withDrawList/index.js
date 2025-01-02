@@ -113,12 +113,12 @@ function WithDrawList() {
 
         if (
           withdrawalsGt2.length === 0 ||
-          withdrawalsGt2.every((item) => item.status === "APPROVED")
+          withdrawalsGt2.every((item) => item.status === "approved")
         ) {
           setEmptyGt2(true);
         } else {
           const rowsGt2 = withdrawalsGt2
-            .filter((item) => item.status !== "APPROVED")
+            .filter((item) => item.status !== "approved")
             .map((item) => ({
               id: item.id || "N/A",
               user_email: item.user.email || "N/A",
@@ -252,7 +252,7 @@ function WithDrawList() {
                 ) : emptyGt2 ? (
                   <MDBox textAlign="center" p={2}>
                     <MDTypography variant="h6" color="textSecondary">
-                      No withdrawals greater than 2.
+                      No withdrawals greater than 2
                     </MDTypography>
                   </MDBox>
                 ) : (
