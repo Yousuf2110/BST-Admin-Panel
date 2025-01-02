@@ -44,7 +44,7 @@ function AllUsersPins() {
       align: "center",
       Cell: ({ row }) => {
         const state = row.original.status?.props?.children;
-        return state === "pending" ? (
+        return state === "PENDING" ? (
           <>
             <MDButton
               color="success"
@@ -79,7 +79,8 @@ function AllUsersPins() {
       })
       .then((response) => {
         const fetchedData = response.data.pins;
-        const filteredData = fetchedData.filter((item) => item.status !== "approve"); // Filter out rows with 'approve' status
+        console.log("fetchedData", fetchedData);
+        const filteredData = fetchedData.filter((item) => item.status !== "approve");
         const formattedRows = filteredData.map((item) => ({
           id: item?.id || "",
           account_number: item?.account_number || "",
@@ -97,15 +98,16 @@ function AllUsersPins() {
                 color:
                   item?.status === "pending"
                     ? "orange"
-                    : item?.status === "approve"
+                    : item?.status === "approved"
                     ? "green"
                     : "red",
                 fontWeight: "bold",
               }}
             >
-              {item?.status}
+              {item?.status?.toUpperCase()}
             </span>
           ),
+
           created_at: item?.created_at ? new Date(item.created_at).toLocaleString() : "N/A",
         }));
         setRows(formattedRows);

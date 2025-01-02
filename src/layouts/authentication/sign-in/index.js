@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -20,6 +20,24 @@ function Basic() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [bgColors, setBgColors] = useState({
+    card: "info",
+    button: "info",
+  });
+  const availableColors = ["info", "success", "warning", "error", "primary", "secondary"];
+
+  const getRandomColor = () => availableColors[Math.floor(Math.random() * availableColors.length)];
+
+  useEffect(() => {
+    const colorInterval = setInterval(() => {
+      setBgColors({
+        card: getRandomColor(),
+        button: getRandomColor(),
+      });
+    }, 2000);
+
+    return () => clearInterval(colorInterval);
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -112,7 +130,7 @@ function Basic() {
       <Card>
         <MDBox
           variant="gradient"
-          bgColor="info"
+          bgColor={bgColors.card}
           borderRadius="lg"
           coloredShadow="info"
           mx={2}
@@ -152,7 +170,13 @@ function Basic() {
               />
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth type="submit">
+              <MDButton
+                variant="gradient"
+                color={bgColors.button}
+                fullWidth
+                type="submit"
+                sx={{ transition: "all 0.5s ease" }}
+              >
                 Login
               </MDButton>
             </MDBox>

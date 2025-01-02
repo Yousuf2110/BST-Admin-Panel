@@ -31,7 +31,7 @@ function ApprovePasswordRequest() {
     {
       Header: "Actions",
       Cell: ({ row }) => {
-        return row.original.status?.props?.children === "pending" ? (
+        return row.original.status?.props?.children === "PENDING" ? (
           <Button
             color="primary"
             onClick={() => handleApproveClick(row.original?.id)}

@@ -113,12 +113,12 @@ function WithDrawList() {
 
         if (
           withdrawalsGt2.length === 0 ||
-          withdrawalsGt2.every((item) => item.status === "approved")
+          withdrawalsGt2.every((item) => item.status === "APPROVED")
         ) {
           setEmptyGt2(true);
         } else {
           const rowsGt2 = withdrawalsGt2
-            .filter((item) => item.status !== "approved") // Exclude approved rows
+            .filter((item) => item.status !== "APPROVED")
             .map((item) => ({
               id: item.id || "N/A",
               user_email: item.user.email || "N/A",
