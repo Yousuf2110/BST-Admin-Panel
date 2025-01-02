@@ -26,6 +26,7 @@ function AllUsersPins() {
   const [selectedPin, setSelectedPin] = useState(null);
   const [pinCount, setPinCount] = useState("");
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false); // New state to track submission status
   const token = localStorage.getItem("authToken");
 
   const columns = [
@@ -142,6 +143,7 @@ function AllUsersPins() {
   };
 
   const handleApproveSubmit = () => {
+    setSubmitting(true); // Disable the button and show loader
     const payload = {
       email: selectedPin?.user_email,
       pin_count: pinCount,
@@ -171,15 +173,18 @@ function AllUsersPins() {
         } else {
           toast.error("Unexpected response from server!");
         }
+        setSubmitting(false); // Re-enable the button after submission
         handleDialogClose();
       })
       .catch((error) => {
         console.error("Error approving pin:", error);
         toast.error("Failed to approve pin!");
+        setSubmitting(false); // Re-enable the button if error occurs
       });
   };
 
   const handleRejectSubmit = () => {
+    setSubmitting(true); // Disable the button and show loader
     axios
       .put(
         `https://ecosphere-pakistan-backend.co-m.pk/api/reject-pin/${selectedPin?.id}`,
@@ -193,12 +198,14 @@ function AllUsersPins() {
       )
       .then(() => {
         toast.success("New Pin Request Rejected successfully!");
+        setSubmitting(false); // Re-enable the button after submission
         handleRejectDialogClose();
         fetchPins();
       })
       .catch((error) => {
         console.error("Error rejecting pin:", error);
         toast.error("New Pin Request Rejected failed!");
+        setSubmitting(false); // Re-enable the button if error occurs
       });
   };
 
@@ -270,8 +277,8 @@ function AllUsersPins() {
           <Button onClick={handleDialogClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleApproveSubmit} color="primary">
-            Submit
+          <Button onClick={handleApproveSubmit} color="primary" disabled={submitting}>
+            {submitting ? <CircularProgress size={24} /> : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -283,8 +290,8 @@ function AllUsersPins() {
           <Button onClick={handleRejectDialogClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleRejectSubmit} color="error">
-            Reject
+          <Button onClick={handleRejectSubmit} color="error" disabled={submitting}>
+            {submitting ? <CircularProgress size={24} /> : "Reject"}
           </Button>
         </DialogActions>
       </Dialog>

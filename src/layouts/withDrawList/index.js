@@ -12,6 +12,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 function WithDrawList() {
   const token = localStorage.getItem("authToken");
+  const [loading, setLoading] = useState(true);
   const [tableDataGt2, setTableDataGt2] = useState({
     columns: [
       { Header: "ID", accessor: "id", align: "left" },
@@ -21,207 +22,138 @@ function WithDrawList() {
       { Header: "Account Title", accessor: "account_title", align: "center" },
       { Header: "Bank", accessor: "bank", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
-      { Header: "Requested", accessor: "created_at", align: "center" },
       { Header: "Actions", accessor: "actions", align: "center" },
     ],
     rows: [],
   });
-
-  const [tableDataLte2, setTableDataLte2] = useState({
-    columns: [
-      { Header: "ID", accessor: "id", align: "left" },
-      { Header: "Email", accessor: "user_email", align: "center" },
-      { Header: "Mobile", accessor: "mobile", align: "center" },
-      { Header: "Amount", accessor: "amount", align: "center" },
-      { Header: "Account Title", accessor: "account_title", align: "center" },
-      { Header: "Bank", accessor: "bank", align: "center" },
-      { Header: "Status", accessor: "status", align: "center" },
-      { Header: "Requested", accessor: "created_at", align: "center" },
-      { Header: "Actions", accessor: "actions", align: "center" },
-    ],
-    rows: [],
-  });
-
-  const [loading, setLoading] = useState(true);
-  const [emptyGt2, setEmptyGt2] = useState(false);
-  const [emptyLte2, setEmptyLte2] = useState(false);
+  const [tableDataLte2, setTableDataLte2] = useState({ ...tableDataGt2 });
 
   const formatDate = (dateString) => {
     try {
       const cleanDate = dateString.split(".")[0].replace("T", " ");
       return cleanDate || "N/A";
-    } catch (error) {
+    } catch {
       return "N/A";
     }
   };
 
   const handleApprove = async (id) => {
+    console.log("id", id);
     try {
       const response = await axios.put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/approve-withdraw/${id}`,
-        {},
+        `https://ecosphere-pakistan-backend.co-m.pk/api/approve-withdraw`,
+        { ids: id },
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
       if (response.status === 200) {
-        setTableDataGt2((prevState) => {
-          const updatedRows = prevState.rows.map((row) =>
-            row.id === id
-              ? {
-                  ...row,
-                  status: (
-                    <MDTypography variant="caption" color="success" fontWeight="medium">
-                      APPROVED
-                    </MDTypography>
-                  ),
-                }
-              : row
-          );
-          return {
-            ...prevState,
-            rows: updatedRows,
-          };
-        });
-
         toast.success("Withdrawal approved successfully!");
+        fetchData(); // Refresh data to reflect changes
+      } else {
+        toast.error("Failed to approve withdrawal. Please try again.");
       }
     } catch (error) {
-      toast.error("Failed to approve withdrawal.");
+      console.log("error", error);
+      toast.error("An error occurred while approving withdrawal.");
+    }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("https://ecosphere-pakistan-backend.co-m.pk/api/withdraws", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const withdrawalsGt2 = response.data?.withdrawals_gt_2 || [];
+      const withdrawalsLte2 = response.data?.withdrawals_lte_2 || [];
+
+      console.log("withdrawalsGt2", withdrawalsLte2);
+
+      setTableDataGt2((prev) => ({
+        ...prev,
+        rows: withdrawalsGt2
+          .filter((item) => item.status !== "approved")
+          .map((item) => ({
+            id: item.id || "N/A",
+            user_email: item.user?.email || "N/A",
+            mobile: item.user?.mobile || "N/A",
+            account_title: item.user?.account_title || "N/A",
+            bank: item.user?.bank || "N/A",
+            amount: parseFloat(item.total_amount).toFixed(2) || "0.00",
+            status: (
+              <MDTypography variant="caption" color="info" fontWeight="medium">
+                {item.status?.toUpperCase()}
+              </MDTypography>
+            ),
+            created_at: formatDate(item?.user?.created_at),
+            actions: item.status === "pending" && (
+              <button
+                style={{
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  padding: "8px 16px",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleApprove(item?.ids)}
+              >
+                Approve
+              </button>
+            ),
+          })),
+      }));
+
+      setTableDataLte2((prev) => ({
+        ...prev,
+        rows: withdrawalsLte2
+          .filter((item) => item.status !== "approved")
+          .map((item) => ({
+            id: item.ids || "N/A",
+            user_email: item.user?.email || "N/A",
+            mobile: item.user?.mobile || "N/A",
+            account_title: item.user?.account_title || "N/A",
+            bank: item.user?.bank || "N/A",
+            amount: parseFloat(item.total_amount).toFixed(2) || "0.00",
+            status: (
+              <MDTypography variant="caption" color="info" fontWeight="medium">
+                {item.status?.toUpperCase()}
+              </MDTypography>
+            ),
+            created_at: formatDate(item.created_at),
+            actions: item.status === "pending" && (
+              <button
+                style={{
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  padding: "8px 16px",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleApprove(item?.ids)}
+              >
+                Approve
+              </button>
+            ),
+          })),
+      }));
+    } catch (error) {
+      toast.error("Failed to fetch data. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://ecosphere-pakistan-backend.co-m.pk/api/withdraws",
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const withdrawalsGt2 = response.data?.withdrawals_gt_2 || [];
-        const withdrawalsLte2 = response.data?.withdrawals_lte_2 || [];
-
-        if (
-          withdrawalsGt2.length === 0 ||
-          withdrawalsGt2.every((item) => item.status === "approved")
-        ) {
-          setEmptyGt2(true);
-        } else {
-          const rowsGt2 = withdrawalsGt2
-            .filter((item) => item.status !== "approved")
-            .map((item) => ({
-              id: item.id || "N/A",
-              user_email: item.user.email || "N/A",
-              mobile: item.user.mobile || "N/A",
-              account_title: item.user.account_title || "N/A",
-              bank: item.user.bank || "N/A",
-              amount: parseFloat(item.amount).toFixed(2) || "0.00",
-              status: (
-                <MDTypography variant="caption" color="info" fontWeight="medium">
-                  {item.status?.toUpperCase() || "N/A"}
-                </MDTypography>
-              ),
-              created_at: formatDate(item.created_at),
-              actions:
-                item.status === "pending" ? (
-                  <div
-                    style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}
-                  >
-                    <button
-                      style={{
-                        backgroundColor: "#4CAF50",
-                        color: "white",
-                        border: "none",
-                        padding: "10px 20px",
-                        fontSize: "16px",
-                        cursor: "pointer",
-                        borderRadius: "5px",
-                        transition: "background-color 0.3s ease",
-                        marginRight: "10px",
-                      }}
-                      onClick={() => handleApprove(item.id)}
-                    >
-                      Approve
-                    </button>
-                  </div>
-                ) : null,
-            }));
-          setTableDataGt2((prevState) => ({
-            ...prevState,
-            rows: rowsGt2,
-          }));
-        }
-
-        if (
-          withdrawalsLte2.length === 0 ||
-          withdrawalsLte2.every((item) => item.status === "approved")
-        ) {
-          setEmptyLte2(true);
-        } else {
-          const rowsLte2 = withdrawalsLte2
-            .filter((item) => item.status !== "approved") // Exclude approved rows
-            .map((item) => ({
-              id: item.id || "N/A",
-              user_email: item.user.email || "N/A",
-              mobile: item.user.mobile || "N/A",
-              account_title: item.user.account_title || "N/A",
-              bank: item.user.bank || "N/A",
-              amount: parseFloat(item.amount).toFixed(2) || "0.00",
-              status: (
-                <MDTypography variant="caption" color="info" fontWeight="medium">
-                  {item.status?.toUpperCase() || "N/A"}
-                </MDTypography>
-              ),
-              created_at: formatDate(item.created_at),
-              actions:
-                item.status === "pending" ? (
-                  <div
-                    style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}
-                  >
-                    <button
-                      style={{
-                        backgroundColor: "#4CAF50",
-                        color: "white",
-                        border: "none",
-                        padding: "10px 20px",
-                        fontSize: "16px",
-                        cursor: "pointer",
-                        borderRadius: "5px",
-                        transition: "background-color 0.3s ease",
-                        marginRight: "10px",
-                      }}
-                      onClick={() => handleApprove(item.id)}
-                    >
-                      Approve
-                    </button>
-                  </div>
-                ) : null,
-            }));
-          setTableDataLte2((prevState) => ({
-            ...prevState,
-            rows: rowsLte2,
-          }));
-        }
-
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching withdrawals:", error);
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [token]);
+  }, []);
 
   return (
     <DashboardLayout>
@@ -249,7 +181,7 @@ function WithDrawList() {
                   <Grid container justifyContent="center">
                     <CircularProgress />
                   </Grid>
-                ) : emptyGt2 ? (
+                ) : tableDataGt2.rows.length === 0 ? (
                   <MDBox textAlign="center" p={2}>
                     <MDTypography variant="h6" color="textSecondary">
                       No withdrawals greater than 2
@@ -258,7 +190,7 @@ function WithDrawList() {
                 ) : (
                   <DataTable
                     table={tableDataGt2}
-                    isSorted={true}
+                    isSorted
                     entriesPerPage={false}
                     showTotalEntries={false}
                     noEndBorder
@@ -281,7 +213,7 @@ function WithDrawList() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Withdrawals Less Than or Equal to 2 Stars
+                  Withdrawals Less Than or Equal to 2
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -289,16 +221,16 @@ function WithDrawList() {
                   <Grid container justifyContent="center">
                     <CircularProgress />
                   </Grid>
-                ) : emptyLte2 ? (
+                ) : tableDataLte2.rows.length === 0 ? (
                   <MDBox textAlign="center" p={2}>
                     <MDTypography variant="h6" color="textSecondary">
-                      No withdrawals less than or equal to 2 Stars
+                      No withdrawals less than or equal to 2
                     </MDTypography>
                   </MDBox>
                 ) : (
                   <DataTable
                     table={tableDataLte2}
-                    isSorted={true}
+                    isSorted
                     entriesPerPage={false}
                     showTotalEntries={false}
                     noEndBorder
@@ -308,9 +240,8 @@ function WithDrawList() {
             </Card>
           </Grid>
         </Grid>
+        <ToastContainer />
       </MDBox>
-
-      <ToastContainer />
     </DashboardLayout>
   );
 }
