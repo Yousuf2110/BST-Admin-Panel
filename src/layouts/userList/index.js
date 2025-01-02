@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -18,6 +17,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 function AllUsers() {
   const token = localStorage.getItem("authToken");
@@ -214,6 +214,9 @@ function AllUsers() {
       }
 
       setOpenEditPopup(false);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (error) {
       toast.error("Error updating user. Please try again.");
     }
@@ -309,14 +312,14 @@ function AllUsers() {
       <Dialog open={openEditPopup} onClose={() => setOpenEditPopup(false)}>
         <DialogTitle>Edit User</DialogTitle>
         <DialogContent>
-          <TextField
+          {/* <TextField
             label="Name"
             fullWidth
             name="name"
             value={formData.name}
             onChange={handleFormChange}
             margin="normal"
-          />
+          /> */}
           <TextField
             label="Account Title"
             fullWidth
