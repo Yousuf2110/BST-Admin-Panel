@@ -60,7 +60,7 @@ function Dashboard() {
                 <ComplexStatisticsCard
                   icon="leaderboard"
                   title="Total Income"
-                  count={`Rs ${data.incomeLt2stars}/-`}
+                  count={`${data.incomeLt2stars}`}
                 />
               </MDBox>
             </Grid>
@@ -70,7 +70,7 @@ function Dashboard() {
                   color="primary"
                   icon={<MonetizationOnIcon />}
                   title="Total Income (2+)"
-                  count={`Rs ${data.income_gt_2stars}/-`}
+                  count={`${data.income_gt_2stars}`}
                 />
               </MDBox>
             </Grid>

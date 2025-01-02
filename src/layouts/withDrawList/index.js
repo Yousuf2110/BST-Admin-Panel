@@ -16,8 +16,10 @@ function WithDrawList() {
     columns: [
       { Header: "ID", accessor: "id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
-      { Header: "Mobile", accessor: "mobile", align: "center" }, // New column for mobile
+      { Header: "Mobile", accessor: "mobile", align: "center" },
       { Header: "Amount", accessor: "amount", align: "center" },
+      { Header: "Account Title", accessor: "account_title", align: "center" },
+      { Header: "Bank", accessor: "bank", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
       { Header: "Requested", accessor: "created_at", align: "center" },
       { Header: "Actions", accessor: "actions", align: "center" },
@@ -31,6 +33,8 @@ function WithDrawList() {
       { Header: "Email", accessor: "user_email", align: "center" },
       { Header: "Mobile", accessor: "mobile", align: "center" },
       { Header: "Amount", accessor: "amount", align: "center" },
+      { Header: "Account Title", accessor: "account_title", align: "center" },
+      { Header: "Bank", accessor: "bank", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
       { Header: "Requested", accessor: "created_at", align: "center" },
       { Header: "Actions", accessor: "actions", align: "center" },
@@ -107,92 +111,102 @@ function WithDrawList() {
         const withdrawalsGt2 = response.data?.withdrawals_gt_2 || [];
         const withdrawalsLte2 = response.data?.withdrawals_lte_2 || [];
 
-        if (withdrawalsGt2.length === 0) {
+        if (
+          withdrawalsGt2.length === 0 ||
+          withdrawalsGt2.every((item) => item.status === "approved")
+        ) {
           setEmptyGt2(true);
         } else {
-          const rowsGt2 = withdrawalsGt2.map((item) => ({
-            id: item.id || "N/A",
-            user_email: item.user.email || "N/A",
-            mobile: item.user.mobile || "N/A", // Added mobile
-            amount: parseFloat(item.amount).toFixed(2) || "0.00",
-            status: (
-              <MDTypography
-                variant="caption"
-                color={item.status === "approved" ? "success" : "info"}
-                fontWeight="medium"
-              >
-                {item.status?.toUpperCase() || "N/A"}
-              </MDTypography>
-            ),
-            created_at: formatDate(item.created_at),
-            actions:
-              item.status === "pending" ? (
-                <div style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}>
-                  <button
-                    style={{
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 20px",
-                      fontSize: "16px",
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                      transition: "background-color 0.3s ease",
-                      marginRight: "10px",
-                    }}
-                    onClick={() => handleApprove(item.id)}
+          const rowsGt2 = withdrawalsGt2
+            .filter((item) => item.status !== "approved") // Exclude approved rows
+            .map((item) => ({
+              id: item.id || "N/A",
+              user_email: item.user.email || "N/A",
+              mobile: item.user.mobile || "N/A",
+              account_title: item.user.account_title || "N/A",
+              bank: item.user.bank || "N/A",
+              amount: parseFloat(item.amount).toFixed(2) || "0.00",
+              status: (
+                <MDTypography variant="caption" color="info" fontWeight="medium">
+                  {item.status?.toUpperCase() || "N/A"}
+                </MDTypography>
+              ),
+              created_at: formatDate(item.created_at),
+              actions:
+                item.status === "pending" ? (
+                  <div
+                    style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}
                   >
-                    Approve
-                  </button>
-                </div>
-              ) : null,
-          }));
+                    <button
+                      style={{
+                        backgroundColor: "#4CAF50",
+                        color: "white",
+                        border: "none",
+                        padding: "10px 20px",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                        transition: "background-color 0.3s ease",
+                        marginRight: "10px",
+                      }}
+                      onClick={() => handleApprove(item.id)}
+                    >
+                      Approve
+                    </button>
+                  </div>
+                ) : null,
+            }));
           setTableDataGt2((prevState) => ({
             ...prevState,
             rows: rowsGt2,
           }));
         }
 
-        if (withdrawalsLte2.length === 0) {
+        if (
+          withdrawalsLte2.length === 0 ||
+          withdrawalsLte2.every((item) => item.status === "approved")
+        ) {
           setEmptyLte2(true);
         } else {
-          const rowsLte2 = withdrawalsLte2.map((item) => ({
-            id: item.id || "N/A",
-            user_email: item.user.email || "N/A",
-            mobile: item.user.mobile || "N/A", // Added mobile
-            amount: parseFloat(item.amount).toFixed(2) || "0.00",
-            status: (
-              <MDTypography
-                variant="caption"
-                color={item.status === "approved" ? "success" : "info"}
-                fontWeight="medium"
-              >
-                {item.status?.toUpperCase() || "N/A"}
-              </MDTypography>
-            ),
-            created_at: formatDate(item.created_at),
-            actions:
-              item.status === "pending" ? (
-                <div style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}>
-                  <button
-                    style={{
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 20px",
-                      fontSize: "16px",
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                      transition: "background-color 0.3s ease",
-                      marginRight: "10px",
-                    }}
-                    onClick={() => handleApprove(item.id)}
+          const rowsLte2 = withdrawalsLte2
+            .filter((item) => item.status !== "approved") // Exclude approved rows
+            .map((item) => ({
+              id: item.id || "N/A",
+              user_email: item.user.email || "N/A",
+              mobile: item.user.mobile || "N/A",
+              account_title: item.user.account_title || "N/A",
+              bank: item.user.bank || "N/A",
+              amount: parseFloat(item.amount).toFixed(2) || "0.00",
+              status: (
+                <MDTypography variant="caption" color="info" fontWeight="medium">
+                  {item.status?.toUpperCase() || "N/A"}
+                </MDTypography>
+              ),
+              created_at: formatDate(item.created_at),
+              actions:
+                item.status === "pending" ? (
+                  <div
+                    style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}
                   >
-                    Approve
-                  </button>
-                </div>
-              ) : null,
-          }));
+                    <button
+                      style={{
+                        backgroundColor: "#4CAF50",
+                        color: "white",
+                        border: "none",
+                        padding: "10px 20px",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                        transition: "background-color 0.3s ease",
+                        marginRight: "10px",
+                      }}
+                      onClick={() => handleApprove(item.id)}
+                    >
+                      Approve
+                    </button>
+                  </div>
+                ) : null,
+            }));
           setTableDataLte2((prevState) => ({
             ...prevState,
             rows: rowsLte2,

@@ -63,7 +63,12 @@ function ApprovePasswordRequest() {
       })
       .then((response) => {
         const fetchedData = response?.data?.resetPasswordRequests;
-        const formattedRows = fetchedData.map((item) => ({
+
+        const filteredData = fetchedData.filter(
+          (item) => item?.status?.toUpperCase() !== "APPROVE"
+        );
+
+        const formattedRows = filteredData.map((item) => ({
           id: item?.id || "",
           account_number: item?.account_number || "",
           transaction_id: item?.transaction_id || "",
@@ -86,7 +91,7 @@ function ApprovePasswordRequest() {
                 fontWeight: "bold",
               }}
             >
-              {item?.status || "N/A"}
+              {(item?.status || "N/A").toUpperCase()}
             </span>
           ),
           created_at: item?.created_at ? new Date(item.created_at).toLocaleString() : "N/A",
@@ -170,7 +175,7 @@ function ApprovePasswordRequest() {
                   <CircularProgress sx={{ display: "block", margin: "auto" }} />
                 ) : rows.length === 0 ? (
                   <MDTypography variant="h6" color="textSecondary" align="center">
-                    No Data Available
+                    No Password Request To Approve
                   </MDTypography>
                 ) : (
                   <DataTable

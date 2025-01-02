@@ -36,6 +36,7 @@ function AllUsersPins() {
     { Header: "Payment Screenshot", accessor: "payment_screenshot", align: "center" },
     { Header: "User Email", accessor: "user_email", align: "center" },
     { Header: "Status", accessor: "status", align: "center" },
+    { Header: "Role", accessor: "role", align: "center" },
     { Header: "Created At", accessor: "created_at", align: "center" },
     {
       Header: "Actions",
@@ -78,7 +79,8 @@ function AllUsersPins() {
       })
       .then((response) => {
         const fetchedData = response.data.pins;
-        const formattedRows = fetchedData.map((item) => ({
+        const filteredData = fetchedData.filter((item) => item.status !== "approve"); // Filter out rows with 'approve' status
+        const formattedRows = filteredData.map((item) => ({
           id: item?.id || "",
           account_number: item?.account_number || "",
           transaction_id: item?.transaction_id || "",
@@ -101,7 +103,7 @@ function AllUsersPins() {
                 fontWeight: "bold",
               }}
             >
-              {(item?.status || "N/A").toUpperCase()}
+              {item?.status}
             </span>
           ),
           created_at: item?.created_at ? new Date(item.created_at).toLocaleString() : "N/A",
@@ -152,7 +154,6 @@ function AllUsersPins() {
         },
       })
       .then((response) => {
-        const message = response.data.message;
         if (response?.data) {
           toast.success("Pin approved successfully!");
           setRows((prevRows) =>

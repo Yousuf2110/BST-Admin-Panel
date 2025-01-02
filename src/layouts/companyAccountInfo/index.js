@@ -61,9 +61,12 @@ function CompanyAccountInfo() {
 
       if (response.data) {
         toast.success("Payment method added successfully!");
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 1000);
+        // Clear the form fields after successful submission
+        setFormData({
+          accountNumber: "",
+          accountTitle: "",
+          bankName: "",
+        });
       } else {
         toast.error(response.data.message || "Something went wrong!");
       }
