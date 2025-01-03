@@ -48,7 +48,7 @@ function ViewRequestPins() {
                 textTransform: "uppercase", // Ensures the status is in uppercase
               }}
             >
-              {item.status === "unused" ? "UNREAD" : item.status}{" "}
+              {item.status === "unused" ? "UNUSED" : item.status}{" "}
               {/* Display "UNREAD" for unused */}
             </span>
           ),

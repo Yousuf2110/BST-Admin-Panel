@@ -69,7 +69,7 @@ function Dashboard() {
               <MDBox mb={1.5}>
                 <ComplexStatisticsCard
                   color="primary"
-                  icon={<Wall />}
+                  icon={<WalletIcon />}
                   title="Total Income (2+)"
                   count={`${data.income_gt_2stars}`}
                 />
