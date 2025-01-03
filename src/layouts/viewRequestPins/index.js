@@ -48,8 +48,7 @@ function ViewRequestPins() {
                 textTransform: "uppercase", // Ensures the status is in uppercase
               }}
             >
-              {item.status === "unused" ? "UNUSED" : item.status}{" "}
-              {/* Display "UNREAD" for unused */}
+              {item.status}
             </span>
           ),
           created_at: new Date(item.created_at).toLocaleString(),
