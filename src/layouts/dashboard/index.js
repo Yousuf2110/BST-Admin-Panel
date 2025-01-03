@@ -7,6 +7,7 @@ import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatist
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import CircularProgress from "@mui/material/CircularProgress";
+import WalletIcon from "@mui/icons-material/Wallet";
 
 function Dashboard() {
   const [data, setData] = useState({
@@ -68,7 +69,7 @@ function Dashboard() {
               <MDBox mb={1.5}>
                 <ComplexStatisticsCard
                   color="primary"
-                  icon={<MonetizationOnIcon />}
+                  icon={<Wall />}
                   title="Total Income (2+)"
                   count={`${data.income_gt_2stars}`}
                 />

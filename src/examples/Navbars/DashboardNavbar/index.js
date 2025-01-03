@@ -146,7 +146,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   fontSize: "6.5rem",
                 }}
               >
-                {miniSidenav ? "menu_open" : "menu"}
+                {miniSidenav ? "reorder" : "menu"}
               </Icon>
             </IconButton>
 
