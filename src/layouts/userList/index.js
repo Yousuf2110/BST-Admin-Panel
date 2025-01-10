@@ -64,6 +64,13 @@ function AllUsers() {
     bank: "",
   });
 
+  const [searchTermLte2, setSearchTermLte2] = useState("");
+  const [searchTermGt2, setSearchTermGt2] = useState("");
+
+  const [originalRowsLte2, setOriginalRowsLte2] = useState([]);
+  const [originalRowsGt2, setOriginalRowsGt2] = useState([]);
+
+  // Fetch data from the API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -106,6 +113,7 @@ function AllUsers() {
             ...prevState,
             rows: rowsLte2,
           }));
+          setOriginalRowsLte2(rowsLte2);
         }
 
         if (usersGt2.length === 0) {
@@ -135,6 +143,7 @@ function AllUsers() {
             ...prevState,
             rows: rowsGt2,
           }));
+          setOriginalRowsGt2(rowsGt2);
         }
 
         setLoading(false);
@@ -147,6 +156,41 @@ function AllUsers() {
     fetchData();
   }, [token]);
 
+  // Handle search for users with <= 2 stars
+  const handleSearchLte2 = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTermLte2(term);
+    const filtered = originalRowsLte2.filter(
+      (row) =>
+        row.name.toLowerCase().includes(term) ||
+        row.email.toLowerCase().includes(term) ||
+        row.mobile.toLowerCase().includes(term)
+    );
+    setTableDataLte2((prevState) => ({
+      ...prevState,
+      rows: filtered,
+    }));
+    setEmptyLte2(filtered.length === 0);
+  };
+
+  // Handle search for users with > 2 stars
+  const handleSearchGt2 = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTermGt2(term);
+    const filtered = originalRowsGt2.filter(
+      (row) =>
+        row.name.toLowerCase().includes(term) ||
+        row.email.toLowerCase().includes(term) ||
+        row.mobile.toLowerCase().includes(term)
+    );
+    setTableDataGt2((prevState) => ({
+      ...prevState,
+      rows: filtered,
+    }));
+    setEmptyGt2(filtered.length === 0);
+  };
+
+  // Handle edit button click
   const handleEditClick = (user) => {
     if (user.role !== "admin") {
       setSelectedUser(user);
@@ -161,6 +205,7 @@ function AllUsers() {
     }
   };
 
+  // Handle form input change
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -169,10 +214,11 @@ function AllUsers() {
     }));
   };
 
+  // Handle form submission
   const handleSubmitForm = async () => {
     try {
       if (!formData.email || !formData.name || !formData.mobile) {
-        toast.error("Name, email and mobile are required.");
+        toast.error("Name, email, and mobile are required.");
         return;
       }
 
@@ -189,7 +235,7 @@ function AllUsers() {
       toast.success("User updated successfully!");
       const updatedUser = response.data.user;
 
-      const updateTableData = (setTableData) => {
+      const updateTableData = (setTableData, setOriginalRows) => {
         setTableData((prevState) => ({
           ...prevState,
           rows: prevState.rows.map((row) =>
@@ -205,12 +251,26 @@ function AllUsers() {
               : row
           ),
         }));
+        setOriginalRows((prevRows) =>
+          prevRows.map((row) =>
+            row.id === updatedUser.id
+              ? {
+                  ...row,
+                  name: updatedUser.name,
+                  account_title: updatedUser.account_title,
+                  email: updatedUser.email,
+                  mobile: updatedUser.mobile,
+                  bank: updatedUser.bank,
+                }
+              : row
+          )
+        );
       };
 
       if (updatedUser && updatedUser.stars <= 2) {
-        updateTableData(setTableDataLte2);
+        updateTableData(setTableDataLte2, setOriginalRowsLte2);
       } else if (updatedUser && updatedUser.stars > 2) {
-        updateTableData(setTableDataGt2);
+        updateTableData(setTableDataGt2, setOriginalRowsGt2);
       }
 
       setOpenEditPopup(false);
@@ -227,6 +287,7 @@ function AllUsers() {
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
+          {/* Users with <= 2 stars */}
           <Grid item xs={12}>
             <Card>
               <MDBox
@@ -242,6 +303,17 @@ function AllUsers() {
                 <MDTypography variant="h6" color="white">
                   Users with less than 2 stars
                 </MDTypography>
+              </MDBox>
+              {/* Search Bar for <= 2 stars */}
+              <MDBox pt={3} px={2}>
+                <TextField
+                  fullWidth
+                  label="Search by Name, Email, or Mobile"
+                  variant="outlined"
+                  value={searchTermLte2}
+                  onChange={handleSearchLte2}
+                  margin="normal"
+                />
               </MDBox>
               <MDBox pt={3}>
                 {loading ? (
@@ -267,6 +339,7 @@ function AllUsers() {
             </Card>
           </Grid>
 
+          {/* Users with > 2 stars */}
           <Grid item xs={12}>
             <Card>
               <MDBox
@@ -282,6 +355,17 @@ function AllUsers() {
                 <MDTypography variant="h6" color="white">
                   Users with more than 2 stars
                 </MDTypography>
+              </MDBox>
+              {/* Search Bar for > 2 stars */}
+              <MDBox pt={3} px={2}>
+                <TextField
+                  fullWidth
+                  label="Search by Name, Email, or Mobile"
+                  variant="outlined"
+                  value={searchTermGt2}
+                  onChange={handleSearchGt2}
+                  margin="normal"
+                />
               </MDBox>
               <MDBox pt={3}>
                 {loading ? (
@@ -309,17 +393,10 @@ function AllUsers() {
         </Grid>
       </MDBox>
 
+      {/* Edit User Dialog */}
       <Dialog open={openEditPopup} onClose={() => setOpenEditPopup(false)}>
         <DialogTitle>Edit User</DialogTitle>
         <DialogContent>
-          {/* <TextField
-            label="Name"
-            fullWidth
-            name="name"
-            value={formData.name}
-            onChange={handleFormChange}
-            margin="normal"
-          /> */}
           <TextField
             label="Account Title"
             fullWidth
