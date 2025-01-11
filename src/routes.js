@@ -9,13 +9,16 @@ import AllUsersPins from "layouts/allUsersPins";
 import ApprovePasswordRequest from "layouts/approvePasswordRequest";
 import CompanyAccountInfo from "layouts/companyAccountInfo";
 import ChangePassword from "layouts/changePassword";
+import AddProduct from "layouts/addProduct";
+import ProductList from "layouts/productList";
+import ProductRequest from "layouts/productRequest";
 
 const routes = [
   {
     type: "collapse",
     name: "Dashboard",
     key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>, // "dashboard" icon for dashboard
+    icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
   },
@@ -23,7 +26,7 @@ const routes = [
     type: "collapse",
     name: "User List",
     key: "user-list",
-    icon: <Icon fontSize="small">group</Icon>, // "group" icon for user list
+    icon: <Icon fontSize="small">group</Icon>,
     route: "/user-list",
     component: <AllUsers />,
   },
@@ -31,15 +34,39 @@ const routes = [
     type: "collapse",
     name: "Withdraw List",
     key: "withdraw-list",
-    icon: <Icon fontSize="small">account_balance_wallet</Icon>, // "account_balance_wallet" icon for withdraw list
+    icon: <Icon fontSize="small">account_balance_wallet</Icon>,
     route: "/withdraw-list",
     component: <WithDrawList />,
   },
   {
     type: "collapse",
+    name: "Product List",
+    key: "product-list",
+    icon: <Icon fontSize="small">inventory</Icon>,
+    route: "/product-list",
+    component: <ProductList />,
+  },
+  // {
+  //   type: "collapse",
+  //   name: "Product Request",
+  //   key: "product-request",
+  //   icon: <Icon fontSize="small">account_balance_wallet</Icon>,
+  //   route: "/product-request",
+  //   component: <ProductRequest />,
+  // },
+  {
+    type: "collapse",
+    name: "Add Product",
+    key: "add-product",
+    icon: <Icon fontSize="small">add_circle</Icon>,
+    route: "/add-product",
+    component: <AddProduct />,
+  },
+  {
+    type: "collapse",
     name: "All Pins List",
     key: "all-pins-lists",
-    icon: <Icon fontSize="small">pin</Icon>, // "pin" icon for all pins list
+    icon: <Icon fontSize="small">pin</Icon>,
     route: "/all-pins-lists",
     component: <ViewRequestPins />,
   },
@@ -47,7 +74,7 @@ const routes = [
     type: "collapse",
     name: "Password Request",
     key: "password-request",
-    icon: <Icon fontSize="small">lock</Icon>, // "lock" icon for password request
+    icon: <Icon fontSize="small">lock</Icon>,
     route: "/password-request",
     component: <ApprovePasswordRequest />,
   },
@@ -55,7 +82,7 @@ const routes = [
     type: "collapse",
     name: "Requested Pins List",
     key: "requested-pins-list",
-    icon: <Icon fontSize="small">push_pin</Icon>, // "push_pin" icon for requested pins list
+    icon: <Icon fontSize="small">push_pin</Icon>,
     route: "/requested-pins-list",
     component: <AllUsersPins />,
   },
@@ -63,7 +90,7 @@ const routes = [
     type: "collapse",
     name: "Company Account Info",
     key: "company-account-info",
-    icon: <Icon fontSize="small">business</Icon>, // "business" icon for company account info
+    icon: <Icon fontSize="small">business</Icon>,
     route: "/company-account-info",
     component: <CompanyAccountInfo />,
   },
@@ -71,7 +98,7 @@ const routes = [
     type: "collapse",
     name: "Change Password",
     key: "change-password",
-    icon: <Icon fontSize="small">key</Icon>, // "key" icon for change password
+    icon: <Icon fontSize="small">key</Icon>,
     route: "change-password",
     component: <ChangePassword />,
   },
@@ -79,7 +106,7 @@ const routes = [
     type: "collapse",
     name: "Notifications",
     key: "notifications",
-    icon: <Icon fontSize="small">notifications_active</Icon>, // "notifications_active" for notifications
+    icon: <Icon fontSize="small">notifications_active</Icon>,
     route: "/notifications",
     component: <Notifications />,
   },
