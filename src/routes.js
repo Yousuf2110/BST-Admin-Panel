@@ -46,14 +46,14 @@ const routes = [
     route: "/product-list",
     component: <ProductList />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Product Request",
-  //   key: "product-request",
-  //   icon: <Icon fontSize="small">account_balance_wallet</Icon>,
-  //   route: "/product-request",
-  //   component: <ProductRequest />,
-  // },
+  {
+    type: "collapse",
+    name: "Product Request",
+    key: "product-request",
+    icon: <Icon fontSize="small">account_balance_wallet</Icon>,
+    route: "/product-request",
+    component: <ProductRequest />,
+  },
   {
     type: "collapse",
     name: "Add Product",

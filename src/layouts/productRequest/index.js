@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -6,143 +9,156 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import IconButton from "@mui/material/IconButton";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 
 function ProductRequest() {
   const token = localStorage.getItem("authToken");
   const [loading, setLoading] = useState(true);
-  const [tableDataGt2, setTableDataGt2] = useState({
+  const [tableData, setTableData] = useState({
     columns: [
-      { Header: "ID", accessor: "id", align: "left" },
+      { Header: "ID", accessor: "product_id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
-      { Header: "Mobile", accessor: "mobile", align: "center" },
+      { Header: "Mobile", accessor: "phone", align: "center" },
       { Header: "Amount", accessor: "amount", align: "center" },
-      { Header: "Account Title", accessor: "account_title", align: "center" },
-      { Header: "Bank", accessor: "bank", align: "center" },
+      { Header: "View ScreenShot", accessor: "payment_screenshot", align: "center" },
+      { Header: "Product Name", accessor: "product_name", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
       { Header: "Actions", accessor: "actions", align: "center" },
     ],
     rows: [],
   });
-  const [tableDataLte2, setTableDataLte2] = useState({ ...tableDataGt2 });
 
-  const formatDate = (dateString) => {
-    try {
-      const cleanDate = dateString.split(".")[0].replace("T", " ");
-      return cleanDate || "N/A";
-    } catch {
-      return "N/A";
-    }
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const handleMenuOpen = (event, id, status) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedId(id);
+    setSelectedStatus(status);
   };
 
-  const handleApprove = async (id) => {
-    console.log("id", id);
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedId(null);
+    setSelectedStatus("");
+  };
+
+  const handleStatusChange = async (event) => {
+    const newStatus = event.target.value;
+    setSelectedStatus(newStatus);
+
     try {
       const response = await axios.put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/all-products`,
-        { ids: id },
+        `https://ecosphere-pakistan-backend.co-m.pk/api/product-requests/${selectedId}`,
+        { status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      if (response.status === 200) {
-        toast.success("Withdrawal approved successfully!");
-        fetchData();
+
+      if (response.data.success) {
+        toast.success("Status updated successfully!");
+        fetchData(); // Refresh the table data
       } else {
-        toast.error("Failed to approve withdrawal. Please try again.");
+        toast.error("Failed to update status. Please try again.");
       }
     } catch (error) {
-      console.log("error", error);
-      toast.error("An error occurred while approving withdrawal.");
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      handleMenuClose();
     }
   };
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("https://ecosphere-pakistan-backend.co-m.pk/api/withdraws", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        "https://ecosphere-pakistan-backend.co-m.pk/api/product-requests",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const withdrawalsGt2 = response.data?.withdrawals_gt_2 || [];
-      const withdrawalsLte2 = response.data?.withdrawals_lte_2 || [];
-
-      console.log("withdrawalsGt2", withdrawalsLte2);
-
-      setTableDataGt2((prev) => ({
-        ...prev,
-        rows: withdrawalsGt2
-          .filter((item) => item.status !== "approved")
-          .map((item) => ({
-            id: item.id || "N/A",
-            user_email: item.user?.email || "N/A",
-            mobile: item.user?.mobile || "N/A",
-            account_title: item.user?.account_title || "N/A",
-            bank: item.user?.bank || "N/A",
-            amount: parseFloat(item.total_amount).toFixed(2) || "0.00",
-            status: (
-              <MDTypography variant="caption" color="info" fontWeight="medium">
-                {item.status?.toUpperCase()}
-              </MDTypography>
-            ),
-            created_at: formatDate(item?.user?.created_at),
-            actions: item.status === "pending" && (
-              <button
-                style={{
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  padding: "8px 16px",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleApprove(item?.ids)}
-              >
-                Approve
-              </button>
-            ),
-          })),
+      const formattedData = response.data?.requests?.map((item) => ({
+        product_id: item.product_id || "N/A",
+        user_email: item?.user_email || "N/A",
+        phone: item?.phone || "N/A",
+        payment_screenshot: item.payment_screenshot ? (
+          <a href={item.payment_screenshot} target="_blank" rel="noopener noreferrer">
+            <button
+              style={{
+                backgroundColor: "#4CAF50",
+                color: "white",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              View ScreenShot
+            </button>
+          </a>
+        ) : (
+          "N/A"
+        ),
+        product_name: item.product_name || "N/A",
+        status: (
+          <MDTypography variant="caption" color="info" fontWeight="medium">
+            {item.status?.toUpperCase()}
+          </MDTypography>
+        ),
+        actions: (
+          <>
+            <IconButton
+              aria-label="more"
+              aria-controls="actions-menu"
+              aria-haspopup="true"
+              onClick={(event) => handleMenuOpen(event, item?.id, item?.status)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="actions-menu"
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl) && selectedId === item?.id}
+              onClose={handleMenuClose}
+            >
+              <FormControl fullWidth>
+                <InputLabel id="status-select-label">Status</InputLabel>
+                <Select
+                  labelId="status-select-label"
+                  id="status-select"
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  label="Status"
+                >
+                  <MenuItem value="Done">Done</MenuItem>
+                  <MenuItem value="Pending">Pending</MenuItem>
+                  <MenuItem value="Processing">Processing</MenuItem>
+                  <MenuItem value="Shipped">Shipped</MenuItem>
+                  <MenuItem value="Delivered">Delivered</MenuItem>
+                  <MenuItem value="Failed">Failed</MenuItem>
+                </Select>
+              </FormControl>
+            </Menu>
+          </>
+        ),
       }));
 
-      setTableDataLte2((prev) => ({
+      setTableData((prev) => ({
         ...prev,
-        rows: withdrawalsLte2
-          .filter((item) => item.status !== "approved")
-          .map((item) => ({
-            id: item.ids || "N/A",
-            user_email: item.user?.email || "N/A",
-            mobile: item.user?.mobile || "N/A",
-            account_title: item.user?.account_title || "N/A",
-            bank: item.user?.bank || "N/A",
-            amount: parseFloat(item.total_amount).toFixed(2) || "0.00",
-            status: (
-              <MDTypography variant="caption" color="info" fontWeight="medium">
-                {item.status?.toUpperCase()}
-              </MDTypography>
-            ),
-            created_at: formatDate(item.created_at),
-            actions: item.status === "pending" && (
-              <button
-                style={{
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  padding: "8px 16px",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleApprove(item?.ids)}
-              >
-                Approve
-              </button>
-            ),
-          })),
+        rows: formattedData,
       }));
     } catch (error) {
       toast.error("Failed to fetch data. Please try again.");
@@ -173,7 +189,7 @@ function ProductRequest() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Withdrawals Greater Than 2
+                  Product Requests
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -181,55 +197,15 @@ function ProductRequest() {
                   <Grid container justifyContent="center">
                     <CircularProgress />
                   </Grid>
-                ) : tableDataGt2.rows.length === 0 ? (
+                ) : tableData.rows.length === 0 ? (
                   <MDBox textAlign="center" p={2}>
                     <MDTypography variant="h6" color="textSecondary">
-                      No withdrawals greater than 2
+                      No product requests found
                     </MDTypography>
                   </MDBox>
                 ) : (
                   <DataTable
-                    table={tableDataGt2}
-                    isSorted
-                    entriesPerPage={false}
-                    showTotalEntries={false}
-                    noEndBorder
-                  />
-                )}
-              </MDBox>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="white">
-                  Withdrawals Less Than or Equal to 2
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <Grid container justifyContent="center">
-                    <CircularProgress />
-                  </Grid>
-                ) : tableDataLte2.rows.length === 0 ? (
-                  <MDBox textAlign="center" p={2}>
-                    <MDTypography variant="h6" color="textSecondary">
-                      No withdrawals less than or equal to 2
-                    </MDTypography>
-                  </MDBox>
-                ) : (
-                  <DataTable
-                    table={tableDataLte2}
+                    table={tableData}
                     isSorted
                     entriesPerPage={false}
                     showTotalEntries={false}

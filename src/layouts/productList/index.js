@@ -14,59 +14,126 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { InputAdornment, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function ProductList() {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
-    address: "",
-    paymentScreenshot: null,
+    description: "",
+    image: null,
+    accountType: "",
   });
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
   const token = localStorage.getItem("authToken");
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [errors, setErrors] = useState({}); // To store backend validation errors
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(
-          "https://ecosphere-pakistan-backend.co-m.pk/api/all-products",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        console.log("Fetched Products:", data.products);
-        setProducts(data.products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
     fetchProducts();
   }, []);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, paymentScreenshot: URL.createObjectURL(file) });
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("https://ecosphere-pakistan-backend.co-m.pk/api/all-products", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      setProducts(data.products);
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
   };
 
-  const handleSubmit = () => {
-    console.log("Form Submitted:", formData);
+  const handleOpen = (product) => {
+    setSelectedProduct(product);
+    setFormData({
+      name: product.name,
+      description: product.description,
+      image: product.image,
+      accountType: product.category.toString(),
+    });
+    setOpen(true);
+  };
+
+  const handleClose = () => {
     setOpen(false);
+    setSelectedProduct(null);
+    setFormData({
+      name: "",
+      description: "",
+      image: null,
+      accountType: "",
+    });
+    setErrors({}); // Clear errors when closing the modal
+  };
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.description) {
+      toast.error("All fields are required.");
+      console.log("Missing fields:", {
+        name: !formData.name,
+        description: !formData.description,
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const formDataObj = new FormData();
+      formDataObj.append("name", formData.name);
+      formDataObj.append("description", formData.description);
+
+      for (let [key, value] of formDataObj.entries()) {
+        console.log(key, value);
+      }
+
+      for (let [key, value] of formDataObj.entries()) {
+        console.log(key, value);
+      }
+
+      const response = await axios.put(
+        `https://ecosphere-pakistan-backend.co-m.pk/api/edit-product/${selectedProduct.id}`,
+        formDataObj,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        toast.success("Product updated successfully!");
+        handleClose();
+        fetchProducts();
+      } else {
+        toast.error(response.data.message || "Something went wrong!");
+      }
+    } catch (err) {
+      if (err.response?.data?.errors) {
+        setErrors(err.response.data.errors);
+        toast.error("Validation errors occurred. Please check the form.");
+      } else {
+        toast.error(err.response?.data?.message || "Failed to update product.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCategoryChange = (e) => {
@@ -77,8 +144,6 @@ function ProductList() {
     selectedCategory === "all"
       ? products
       : products.filter((product) => product.category.toString() === selectedCategory);
-
-  console.log("Filtered Products:", filteredProducts);
 
   return (
     <DashboardLayout>
@@ -92,9 +157,9 @@ function ProductList() {
           <InputLabel>Category</InputLabel>
           <Select value={selectedCategory} onChange={handleCategoryChange} label="Category">
             <MenuItem value="all">All</MenuItem>
-            <MenuItem value="1"> 1 Account</MenuItem>
-            <MenuItem value="2">3 Account</MenuItem>
-            <MenuItem value="3">7 Account</MenuItem>
+            <MenuItem value="1">1 Account</MenuItem>
+            <MenuItem value="3">3 Accounts</MenuItem>
+            <MenuItem value="7">7 Accounts</MenuItem>
           </Select>
         </FormControl>
 
@@ -125,7 +190,7 @@ function ProductList() {
                     variant="contained"
                     color="primary"
                     fullWidth
-                    onClick={handleOpen}
+                    onClick={() => handleOpen(product)}
                   >
                     Edit Product
                   </Button>
@@ -150,77 +215,59 @@ function ProductList() {
             borderRadius: 2,
           }}
         >
-          <Typography variant="h6" mb={2}>
-            Purchase Form
-          </Typography>
-          <TextField
-            fullWidth
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Address"
-            name="address"
-            placeholder="اپنے قریبی ڈاک خانہ کا مکمل پتہ لکھیں"
-            value={formData.address}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-          <Box sx={{ mt: 2 }}>
-            <TextField
-              fullWidth
-              label="Payment Screenshot"
-              value={formData.paymentScreenshot ? "Screenshot Selected" : ""}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Button component="label" startIcon={<PhotoCamera />} size="small">
-                      Upload
-                      <input type="file" accept="image/*" hidden onChange={handleImageChange} />
-                    </Button>
-                  </InputAdornment>
-                ),
-              }}
-              disabled
-            />
-            {formData.paymentScreenshot && (
-              <Box
-                sx={{
-                  mt: 2,
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <img
-                  src={formData.paymentScreenshot}
-                  alt="Payment Screenshot"
-                  style={{ maxWidth: "100%", maxHeight: "150px" }}
-                />
-              </Box>
-            )}
-          </Box>
-          <Button
-            style={{ color: "#fff" }}
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
-            onClick={handleSubmit}
-          >
-            Submit
-          </Button>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Product Name"
+                name="name"
+                variant="outlined"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter product name"
+                error={!!errors.name}
+                helperText={errors.name ? errors.name[0] : ""}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Product Description"
+                name="description"
+                variant="outlined"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter product description"
+                multiline
+                rows={4}
+                error={!!errors.description}
+                helperText={errors.description ? errors.description[0] : ""}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <MDBox textAlign="center" mt={2}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={isLoading}
+                  sx={{
+                    background: "linear-gradient(90deg, #ff512f, #dd2476)",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    padding: "12px",
+                    textTransform: "uppercase",
+                    "&:hover": {
+                      background: "linear-gradient(90deg, #dd2476, #ff512f)",
+                    },
+                  }}
+                  onClick={handleSubmit}
+                >
+                  {isLoading ? "Editing..." : "Edit Product"}
+                </Button>
+              </MDBox>
+            </Grid>
+          </Grid>
         </Box>
       </Modal>
     </DashboardLayout>
