@@ -67,7 +67,7 @@ function ChangePassword() {
       payload.append("new_password", formData.newPassword);
 
       const response = await axios.post(
-        "https://ecosphere-pakistan-backend.co-m.pk/api/change-password",
+        "https://backend.salespronetworks.com/api/change-password",
         payload,
         {
           headers: {

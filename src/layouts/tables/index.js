@@ -27,7 +27,7 @@ function Tables() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://ecosphere-pakistan-backend.co-m.pk/api/users", {
+        const response = await axios.get("https://backend.salespronetworks.com/api/users", {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Authorization: `Bearer ${token}`,

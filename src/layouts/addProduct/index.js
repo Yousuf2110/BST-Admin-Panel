@@ -55,7 +55,7 @@ function AddProduct() {
       formDataObj.append("category", formData.accountType);
 
       const response = await axios.post(
-        "https://ecosphere-pakistan-backend.co-m.pk/api/add-product",
+        "https://backend.salespronetworks.com/api/add-product",
         formDataObj,
         {
           headers: {

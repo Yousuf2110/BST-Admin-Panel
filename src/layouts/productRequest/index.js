@@ -11,11 +11,13 @@ import DataTable from "examples/Tables/DataTable";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import { MenuItem } from "@mui/material";
 
 function ProductRequest() {
   const token = localStorage.getItem("authToken");
@@ -25,7 +27,6 @@ function ProductRequest() {
       { Header: "ID", accessor: "product_id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
       { Header: "Mobile", accessor: "phone", align: "center" },
-      { Header: "Amount", accessor: "amount", align: "center" },
       { Header: "View ScreenShot", accessor: "payment_screenshot", align: "center" },
       { Header: "Product Name", accessor: "product_name", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
@@ -34,18 +35,18 @@ function ProductRequest() {
     rows: [],
   });
 
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const handleMenuOpen = (event, id, status) => {
-    setAnchorEl(event.currentTarget);
+  const handleModalOpen = (id, status) => {
     setSelectedId(id);
     setSelectedStatus(status);
+    setModalOpen(true);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleModalClose = () => {
+    setModalOpen(false);
     setSelectedId(null);
     setSelectedStatus("");
   };
@@ -53,11 +54,13 @@ function ProductRequest() {
   const handleStatusChange = async (event) => {
     const newStatus = event.target.value;
     setSelectedStatus(newStatus);
+  };
 
+  const updateStatus = async () => {
     try {
       const response = await axios.put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/product-requests/${selectedId}`,
-        { status: newStatus },
+        `https://backend.salespronetworks.com/api/product-request/${selectedId}`,
+        { status: selectedStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,7 +68,7 @@ function ProductRequest() {
         }
       );
 
-      if (response.data.success) {
+      if (response.data) {
         toast.success("Status updated successfully!");
         fetchData(); // Refresh the table data
       } else {
@@ -74,7 +77,7 @@ function ProductRequest() {
     } catch (error) {
       toast.error("An error occurred. Please try again.");
     } finally {
-      handleMenuClose();
+      handleModalClose();
     }
   };
 
@@ -82,7 +85,7 @@ function ProductRequest() {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://ecosphere-pakistan-backend.co-m.pk/api/product-requests",
+        "https://backend.salespronetworks.com/api/product-requests",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -119,40 +122,14 @@ function ProductRequest() {
           </MDTypography>
         ),
         actions: (
-          <>
-            <IconButton
-              aria-label="more"
-              aria-controls="actions-menu"
-              aria-haspopup="true"
-              onClick={(event) => handleMenuOpen(event, item?.id, item?.status)}
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              id="actions-menu"
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl) && selectedId === item?.id}
-              onClose={handleMenuClose}
-            >
-              <FormControl fullWidth>
-                <InputLabel id="status-select-label">Status</InputLabel>
-                <Select
-                  labelId="status-select-label"
-                  id="status-select"
-                  value={selectedStatus}
-                  onChange={handleStatusChange}
-                  label="Status"
-                >
-                  <MenuItem value="Done">Done</MenuItem>
-                  <MenuItem value="Pending">Pending</MenuItem>
-                  <MenuItem value="Processing">Processing</MenuItem>
-                  <MenuItem value="Shipped">Shipped</MenuItem>
-                  <MenuItem value="Delivered">Delivered</MenuItem>
-                  <MenuItem value="Failed">Failed</MenuItem>
-                </Select>
-              </FormControl>
-            </Menu>
-          </>
+          <IconButton
+            aria-label="more"
+            aria-controls="actions-menu"
+            aria-haspopup="true"
+            onClick={() => handleModalOpen(item?.id, item?.status)}
+          >
+            <MoreVertIcon />
+          </IconButton>
         ),
       }));
 
@@ -218,6 +195,51 @@ function ProductRequest() {
         </Grid>
         <ToastContainer />
       </MDBox>
+
+      {/* Modal for changing status */}
+      <Modal open={modalOpen} onClose={handleModalClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <MDTypography variant="h6" mb={2}>
+            Change Status
+          </MDTypography>
+          <FormControl fullWidth>
+            <InputLabel id="status-select-label">Status</InputLabel>
+            <Select
+              labelId="status-select-label"
+              id="status-select"
+              value={selectedStatus}
+              onChange={handleStatusChange}
+              label="Status"
+            >
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="Processing">Processing</MenuItem>
+              <MenuItem value="Shipped">Shipped</MenuItem>
+              <MenuItem value="Delivered">Delivered</MenuItem>
+              <MenuItem value="Failed">Failed</MenuItem>
+            </Select>
+          </FormControl>
+          <Box mt={2} display="flex" justifyContent="flex-end">
+            <Button onClick={handleModalClose} sx={{ mr: 2 }}>
+              Cancel
+            </Button>
+            <Button onClick={updateStatus} variant="contained" color="primary">
+              Update
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </DashboardLayout>
   );
 }

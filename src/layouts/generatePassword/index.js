@@ -49,7 +49,7 @@ function GeneratedPassword() {
       payload.append("email", formData.email);
 
       const response = await axios.post(
-        "https://ecosphere-pakistan-backend.co-m.pk/api/change-password-request",
+        "https://backend.salespronetworks.com/api/change-password-request",
         payload,
         {
           headers: {

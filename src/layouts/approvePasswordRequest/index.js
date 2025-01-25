@@ -55,7 +55,7 @@ function ApprovePasswordRequest() {
     setLoading(true);
     setError("");
     axios
-      .get("https://ecosphere-pakistan-backend.co-m.pk/api/reset-password", {
+      .get("https://backend.salespronetworks.com/api/reset-password", {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ function ApprovePasswordRequest() {
     setLoading(true);
     axios
       .put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/reset-password/${id}`,
+        `https://backend.salespronetworks.com/api/reset-password/${id}`,
         {},
         {
           headers: {

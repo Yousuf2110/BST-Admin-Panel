@@ -50,7 +50,7 @@ const routes = [
     type: "collapse",
     name: "Product Request",
     key: "product-request",
-    icon: <Icon fontSize="small">account_balance_wallet</Icon>,
+    icon: <Icon fontSize="small">add_shopping_cart</Icon>,
     route: "/product-request",
     component: <ProductRequest />,
   },

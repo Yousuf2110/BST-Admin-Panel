@@ -25,7 +25,7 @@ function ViewRequestPins() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("https://ecosphere-pakistan-backend.co-m.pk/api/all-users-pins", {
+      .get("https://backend.salespronetworks.com/api/all-users-pins", {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization: `Bearer ${token}`,

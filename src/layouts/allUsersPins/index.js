@@ -72,7 +72,7 @@ function AllUsersPins() {
   const fetchPins = () => {
     setLoading(true);
     axios
-      .get("https://ecosphere-pakistan-backend.co-m.pk/api/pins", {
+      .get("https://backend.salespronetworks.com/api/pins", {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization: `Bearer ${token}`,
@@ -151,7 +151,7 @@ function AllUsersPins() {
     };
 
     axios
-      .post("https://ecosphere-pakistan-backend.co-m.pk/api/approve-pin", payload, {
+      .post("https://backend.salespronetworks.com/api/approve-pin", payload, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -187,7 +187,7 @@ function AllUsersPins() {
     setSubmitting(true); // Disable the button and show loader
     axios
       .put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/reject-pin/${selectedPin?.id}`,
+        `https://backend.salespronetworks.com/api/reject-pin/${selectedPin?.id}`,
         {},
         {
           headers: {

@@ -41,7 +41,7 @@ function WithDrawList() {
     console.log("id", id);
     try {
       const response = await axios.put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/approve-withdraw`,
+        `https://backend.salespronetworks.com/api/approve-withdraw`,
         { ids: id },
         {
           headers: {
@@ -64,7 +64,7 @@ function WithDrawList() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("https://ecosphere-pakistan-backend.co-m.pk/api/withdraws", {
+      const response = await axios.get("https://backend.salespronetworks.com/api/withdraws", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -79,8 +79,8 @@ function WithDrawList() {
         ...prev,
         rows: withdrawalsGt2
           .filter((item) => item.status !== "approved")
-          .map((item) => ({
-            id: item.id || "N/A",
+          .map((item, i) => ({
+            id: i + 1 || "N/A",
             user_email: item.user?.email || "N/A",
             mobile: item.user?.mobile || "N/A",
             account_title: item.user?.account_title || "N/A",
@@ -114,8 +114,8 @@ function WithDrawList() {
         ...prev,
         rows: withdrawalsLte2
           .filter((item) => item.status !== "approved")
-          .map((item) => ({
-            id: item.ids || "N/A",
+          .map((item, i) => ({
+            id: i + 1 || "N/A",
             user_email: item.user?.email || "N/A",
             mobile: item.user?.mobile || "N/A",
             account_title: item.user?.account_title || "N/A",

@@ -24,6 +24,7 @@ function ProductList() {
     description: "",
     image: null,
     accountType: "",
+    status: "",
   });
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +39,7 @@ function ProductList() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("https://ecosphere-pakistan-backend.co-m.pk/api/all-products", {
+      const response = await fetch("https://backend.salespronetworks.com/api/all-products", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -57,6 +58,7 @@ function ProductList() {
       description: product.description,
       image: product.image,
       accountType: product.category.toString(),
+      status: product.status,
     });
     setOpen(true);
   };
@@ -69,17 +71,16 @@ function ProductList() {
       description: "",
       image: null,
       accountType: "",
+      status: "",
     });
     setErrors({}); // Clear errors when closing the modal
   };
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "image") {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+  const handleChange = (value, key) => {
+    setFormData({
+      ...formData,
+      [key]: value,
+    });
   };
 
   const handleSubmit = async () => {
@@ -94,24 +95,17 @@ function ProductList() {
 
     try {
       setIsLoading(true);
-      const formDataObj = new FormData();
-      formDataObj.append("name", formData.name);
-      formDataObj.append("description", formData.description);
-
-      for (let [key, value] of formDataObj.entries()) {
-        console.log(key, value);
-      }
-
-      for (let [key, value] of formDataObj.entries()) {
-        console.log(key, value);
-      }
-
       const response = await axios.put(
-        `https://ecosphere-pakistan-backend.co-m.pk/api/edit-product/${selectedProduct.id}`,
-        formDataObj,
+        `https://backend.salespronetworks.com/api/edit-product/${selectedProduct.id}`,
+        {
+          name: formData.name,
+          description: formData.description,
+          category: formData.accountType,
+          status: formData.status,
+        },
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/x-www-form-urlencoded",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -152,16 +146,6 @@ function ProductList() {
         <Typography variant="h5" fontWeight="bold" mb={2}>
           All Products
         </Typography>
-
-        <FormControl fullWidth sx={{ mb: 3 }}>
-          <InputLabel>Category</InputLabel>
-          <Select value={selectedCategory} onChange={handleCategoryChange} label="Category">
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="1">1 Account</MenuItem>
-            <MenuItem value="3">3 Accounts</MenuItem>
-            <MenuItem value="7">7 Accounts</MenuItem>
-          </Select>
-        </FormControl>
 
         <Grid container spacing={3}>
           {filteredProducts?.map((product) => (
@@ -223,7 +207,7 @@ function ProductList() {
                 name="name"
                 variant="outlined"
                 value={formData.name}
-                onChange={handleChange}
+                onChange={(e) => handleChange(e.target?.value, 'name')}
                 placeholder="Enter product name"
                 error={!!errors.name}
                 helperText={errors.name ? errors.name[0] : ""}
@@ -236,13 +220,26 @@ function ProductList() {
                 name="description"
                 variant="outlined"
                 value={formData.description}
-                onChange={handleChange}
+                onChange={(e) => handleChange(e.target?.value, 'description')}
                 placeholder="Enter product description"
                 multiline
                 rows={4}
                 error={!!errors.description}
                 helperText={errors.description ? errors.description[0] : ""}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={formData.status}
+                  onChange={(e) => handleChange(e.target.value, "status")}
+                  label="Status"
+                >
+                  <MenuItem value="1">Enabled</MenuItem>
+                  <MenuItem value="0">Disabled</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <MDBox textAlign="center" mt={2}>

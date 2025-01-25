@@ -74,7 +74,7 @@ function AllUsers() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://ecosphere-pakistan-backend.co-m.pk/api/users", {
+        const response = await axios.get("https://backend.salespronetworks.com/api/users", {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Authorization: `Bearer ${token}`,
@@ -223,7 +223,7 @@ function AllUsers() {
       }
 
       const response = await axios.post(
-        "https://ecosphere-pakistan-backend.co-m.pk/api/change-user",
+        "https://backend.salespronetworks.com/api/change-user",
         formData,
         {
           headers: {

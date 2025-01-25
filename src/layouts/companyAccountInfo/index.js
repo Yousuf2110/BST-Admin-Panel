@@ -49,7 +49,7 @@ function CompanyAccountInfo() {
       };
 
       const response = await axios.post(
-        "https://ecosphere-pakistan-backend.co-m.pk/api/payment-method",
+        "https://backend.salespronetworks.com/api/payment-method",
         payload,
         {
           headers: {
