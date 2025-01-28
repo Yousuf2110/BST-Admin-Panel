@@ -12,6 +12,7 @@ import ChangePassword from "layouts/changePassword";
 import AddProduct from "layouts/addProduct";
 import ProductList from "layouts/productList";
 import ProductRequest from "layouts/productRequest";
+import PostTitle from "layouts/postTitle";
 
 const routes = [
   {
@@ -109,6 +110,14 @@ const routes = [
     icon: <Icon fontSize="small">notifications_active</Icon>,
     route: "/notifications",
     component: <Notifications />,
+  },
+  {
+    type: "collapse",
+    name: "Post Title",
+    key: "notifications",
+    icon: <Icon fontSize="small">post_add</Icon>,
+    route: "/post-title",
+    component: <PostTitle />,
   },
 ];
 

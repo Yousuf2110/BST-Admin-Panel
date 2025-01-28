@@ -8,10 +8,17 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
 import CircularProgress from "@mui/material/CircularProgress";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 function ViewRequestPins() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false); // State for controlling the modal
   const token = localStorage.getItem("authToken");
 
   const columns = [
@@ -23,6 +30,10 @@ function ViewRequestPins() {
   ];
 
   useEffect(() => {
+    fetchData();
+  }, [token]);
+
+  const fetchData = () => {
     setLoading(true);
     axios
       .get("https://backend.salespronetworks.com/api/all-users-pins", {
@@ -33,9 +44,7 @@ function ViewRequestPins() {
       })
       .then((response) => {
         const fetchedData = response.data.pins;
-
         const filteredData = fetchedData.filter((item) => item.status !== "used");
-
         const formattedRows = filteredData.map((item) => ({
           id: item.id,
           user_email: item.user_email,
@@ -43,9 +52,9 @@ function ViewRequestPins() {
           status: (
             <span
               style={{
-                color: item.status === "unused" ? "green" : "red", // Green for "unused", red for others
+                color: item.status === "unused" ? "green" : "red",
                 fontWeight: "bold",
-                textTransform: "uppercase", // Ensures the status is in uppercase
+                textTransform: "uppercase",
               }}
             >
               {item.status}
@@ -53,7 +62,6 @@ function ViewRequestPins() {
           ),
           created_at: new Date(item.created_at).toLocaleString(),
         }));
-
         setRows(formattedRows);
         setLoading(false);
       })
@@ -61,7 +69,32 @@ function ViewRequestPins() {
         console.error("Error fetching data:", error);
         setLoading(false);
       });
-  }, [token]);
+  };
+
+  const handleDeleteAllPins = () => {
+    setOpen(true); // Open the confirmation modal
+  };
+
+  const handleConfirmDelete = () => {
+    axios
+      .delete("https://backend.salespronetworks.com/api/delete-all-pins", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => {
+        setOpen(false); // Close the modal
+        fetchData(); // Refresh the data
+      })
+      .catch((error) => {
+        console.error("Error deleting pins:", error);
+        setOpen(false);
+      });
+  };
+
+  const handleClose = () => {
+    setOpen(false); // Close the modal without deleting
+  };
 
   return (
     <DashboardLayout>
@@ -83,6 +116,19 @@ function ViewRequestPins() {
                 <MDTypography variant="h6" color="white">
                   Pins List
                 </MDTypography>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleDeleteAllPins}
+                  style={{
+                    marginLeft: "auto",
+                    background: "red",
+                    color: "#fff",
+                    marginTop: 10,
+                  }}
+                >
+                  Delete All Pins
+                </Button>
               </MDBox>
               <MDBox pt={3}>
                 {loading ? (
@@ -107,6 +153,23 @@ function ViewRequestPins() {
           </Grid>
         </Grid>
       </MDBox>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>{"Delete All Pins?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete all pins? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="secondary" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </DashboardLayout>
   );
 }

@@ -23,10 +23,11 @@ function AllUsersPins() {
   const [rows, setRows] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
+  const [openDeleteAllDialog, setOpenDeleteAllDialog] = useState(false); // State for delete all modal
   const [selectedPin, setSelectedPin] = useState(null);
   const [pinCount, setPinCount] = useState("");
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false); // New state to track submission status
+  const [submitting, setSubmitting] = useState(false);
   const token = localStorage.getItem("authToken");
 
   const columns = [
@@ -108,7 +109,6 @@ function AllUsersPins() {
               {item?.status?.toUpperCase()}
             </span>
           ),
-
           created_at: item?.created_at ? new Date(item.created_at).toLocaleString() : "N/A",
         }));
         setRows(formattedRows);
@@ -131,6 +131,32 @@ function AllUsersPins() {
     setOpenRejectDialog(true);
   };
 
+  const handleDeleteAllClick = () => {
+    setOpenDeleteAllDialog(true); // Open the delete all confirmation modal
+  };
+
+  const handleDeleteAllConfirm = () => {
+    setSubmitting(true);
+    axios
+      .delete("https://backend.salespronetworks.com/api/delete-all-pins", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => {
+        toast.success("All pins deleted successfully!");
+        setOpenDeleteAllDialog(false);
+        fetchPins(); // Refresh the data
+      })
+      .catch((error) => {
+        console.error("Error deleting all pins:", error);
+        toast.error("Failed to delete all pins!");
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
+  };
+
   const handleDialogClose = () => {
     setOpenDialog(false);
     setPinCount("");
@@ -142,8 +168,12 @@ function AllUsersPins() {
     setSelectedPin(null);
   };
 
+  const handleDeleteAllDialogClose = () => {
+    setOpenDeleteAllDialog(false); // Close the delete all modal
+  };
+
   const handleApproveSubmit = () => {
-    setSubmitting(true); // Disable the button and show loader
+    setSubmitting(true);
     const payload = {
       email: selectedPin?.user_email,
       pin_count: pinCount,
@@ -173,18 +203,18 @@ function AllUsersPins() {
         } else {
           toast.error("Unexpected response from server!");
         }
-        setSubmitting(false); // Re-enable the button after submission
+        setSubmitting(false);
         handleDialogClose();
       })
       .catch((error) => {
         console.error("Error approving pin:", error);
         toast.error("Failed to approve pin!");
-        setSubmitting(false); // Re-enable the button if error occurs
+        setSubmitting(false);
       });
   };
 
   const handleRejectSubmit = () => {
-    setSubmitting(true); // Disable the button and show loader
+    setSubmitting(true);
     axios
       .put(
         `https://backend.salespronetworks.com/api/reject-pin/${selectedPin?.id}`,
@@ -198,14 +228,14 @@ function AllUsersPins() {
       )
       .then(() => {
         toast.success("New Pin Request Rejected successfully!");
-        setSubmitting(false); // Re-enable the button after submission
+        setSubmitting(false);
         handleRejectDialogClose();
         fetchPins();
       })
       .catch((error) => {
         console.error("Error rejecting pin:", error);
         toast.error("New Pin Request Rejected failed!");
-        setSubmitting(false); // Re-enable the button if error occurs
+        setSubmitting(false);
       });
   };
 
@@ -233,6 +263,18 @@ function AllUsersPins() {
                 <MDTypography variant="h6" color="white">
                   Pins List
                 </MDTypography>
+                <MDButton
+                  color="error"
+                  onClick={handleDeleteAllClick}
+                  style={{
+                    marginLeft: "auto",
+                    background: "red",
+                    color: "#fff",
+                    marginTop: 10,
+                  }}
+                >
+                  Delete All Pins
+                </MDButton>
               </MDBox>
               <MDBox pt={3}>
                 {loading ? (
@@ -292,6 +334,21 @@ function AllUsersPins() {
           </Button>
           <Button onClick={handleRejectSubmit} color="error" disabled={submitting}>
             {submitting ? <CircularProgress size={24} /> : "Reject"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openDeleteAllDialog} onClose={handleDeleteAllDialogClose}>
+        <DialogTitle>Delete All Pins</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete all pins? This action cannot be undone.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteAllDialogClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteAllConfirm} color="error" disabled={submitting}>
+            {submitting ? <CircularProgress size={24} /> : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>
