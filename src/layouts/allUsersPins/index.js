@@ -101,8 +101,8 @@ function AllUsersPins() {
                   item?.status === "pending"
                     ? "orange"
                     : item?.status === "approved"
-                    ? "green"
-                    : "red",
+                      ? "green"
+                      : "red",
                 fontWeight: "bold",
               }}
             >
@@ -138,13 +138,13 @@ function AllUsersPins() {
   const handleDeleteAllConfirm = () => {
     setSubmitting(true);
     axios
-      .delete("https://backend.salespronetworks.com/api/delete-all-pins", {
+      .delete("https://backend.salespronetworks.com/api/del-all-pins-requests", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then(() => {
-        toast.success("All pins deleted successfully!");
+        toast.success("All Requests deleted successfully!");
         setOpenDeleteAllDialog(false);
         fetchPins(); // Refresh the data
       })
@@ -194,9 +194,9 @@ function AllUsersPins() {
             prevRows.map((row) =>
               row.id === selectedPin?.id
                 ? {
-                    ...row,
-                    status: <span style={{ color: "green", fontWeight: "bold" }}>approved</span>,
-                  }
+                  ...row,
+                  status: <span style={{ color: "green", fontWeight: "bold" }}>approved</span>,
+                }
                 : row
             )
           );
@@ -273,7 +273,7 @@ function AllUsersPins() {
                     marginTop: 10,
                   }}
                 >
-                  Delete All Pins
+                  Delete All Requests
                 </MDButton>
               </MDBox>
               <MDBox pt={3}>
@@ -339,9 +339,9 @@ function AllUsersPins() {
       </Dialog>
 
       <Dialog open={openDeleteAllDialog} onClose={handleDeleteAllDialogClose}>
-        <DialogTitle>Delete All Pins</DialogTitle>
+        <DialogTitle>Delete All Requests</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete all pins? This action cannot be undone.
+          Are you sure you want to delete all Requests? This action cannot be undone.
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteAllDialogClose} color="secondary">

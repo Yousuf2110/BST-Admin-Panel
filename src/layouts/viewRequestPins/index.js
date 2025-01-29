@@ -77,7 +77,7 @@ function ViewRequestPins() {
 
   const handleConfirmDelete = () => {
     axios
-      .delete("https://backend.salespronetworks.com/api/delete-all-pins", {
+      .delete("https://backend.salespronetworks.com/api/del-all-unused-pins", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
