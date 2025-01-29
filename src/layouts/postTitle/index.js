@@ -23,19 +23,16 @@ function PostTitle() {
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
   const [formData, setFormData] = useState({
-    title: "",
     description: "",
-    category: "", // New field for dropdown
+    category: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
 
   // Dropdown options
   const categories = [
-    { value: "technology", label: "Technology" },
-    { value: "business", label: "Business" },
-    { value: "health", label: "Health" },
-    { value: "education", label: "Education" },
+    { value: "pin", label: "Pin Request" },
+    { value: "product", label: "Product List" },
   ];
 
   const handleChange = (e) => {
@@ -46,7 +43,7 @@ function PostTitle() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.description || !formData.category) {
+    if (!formData.description || !formData.category) {
       toast.error("All fields are required.");
       return;
     }
@@ -54,13 +51,12 @@ function PostTitle() {
     try {
       setIsLoading(true);
       const payload = {
-        title: formData.title,
-        description: formData.description,
-        category: formData.category,
+        message: formData.description,
+        type: formData.category,
       };
 
       const response = await axios.post(
-        "https://backend.salespronetworks.com/api/create-post",
+        "https://backend.salespronetworks.com/api/alert-message",
         payload,
         {
           headers: {
@@ -71,7 +67,7 @@ function PostTitle() {
       );
 
       if (response.data) {
-        toast.success("Post created successfully!");
+        toast.success(response.data?.message);
         setTimeout(() => {
           navigate("/dashboard");
         }, 1000);
@@ -101,23 +97,12 @@ function PostTitle() {
         >
           <MDBox textAlign="center" mb={3}>
             <MDTypography variant="h4" fontWeight="bold" color="textPrimary" gutterBottom>
-              Post Title
+              Alert Message
             </MDTypography>
           </MDBox>
 
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Title"
-                  name="title"
-                  variant="outlined"
-                  value={formData.title}
-                  onChange={handleChange}
-                  type="text"
-                />
-              </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -133,9 +118,8 @@ function PostTitle() {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth variant="outlined">
-                  <InputLabel>Category</InputLabel>
+                  <InputLabel>Type</InputLabel>
                   <Select
-                    style={{ height: 45 }}
                     name="category"
                     value={formData.category}
                     onChange={handleChange}

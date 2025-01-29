@@ -113,10 +113,10 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Post Title",
-    key: "notifications",
+    name: "Alert Message",
+    key: "alert-messages",
     icon: <Icon fontSize="small">post_add</Icon>,
-    route: "/post-title",
+    route: "/alert-messages",
     component: <PostTitle />,
   },
 ];
