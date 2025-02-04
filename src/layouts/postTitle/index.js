@@ -33,6 +33,7 @@ function PostTitle() {
   const categories = [
     { value: "pin", label: "Pin Request" },
     { value: "product", label: "Product List" },
+    { value: "login", label: "Login Alert" },
   ];
 
   const handleChange = (e) => {

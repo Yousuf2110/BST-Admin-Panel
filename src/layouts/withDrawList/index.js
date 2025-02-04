@@ -85,7 +85,7 @@ function WithDrawList() {
             mobile: item.user?.mobile || "N/A",
             account_title: item.user?.account_title || "N/A",
             bank: item.user?.bank || "N/A",
-            amount: parseFloat(item.total_amount).toFixed(2) || "0.00",
+            amount: parseFloat(item.total_amount).toString().replace(/\.00$/, "") || "0",
             status: (
               <MDTypography variant="caption" color="info" fontWeight="medium">
                 {item.status?.toUpperCase()}
@@ -120,7 +120,7 @@ function WithDrawList() {
             mobile: item.user?.mobile || "N/A",
             account_title: item.user?.account_title || "N/A",
             bank: item.user?.bank || "N/A",
-            amount: parseFloat(item.total_amount).toFixed(2) || "0.00",
+            amount: parseFloat(item.total_amount).toString().replace(/\.00$/, "") || "0",
             status: (
               <MDTypography variant="caption" color="info" fontWeight="medium">
                 {item.status?.toUpperCase()}
