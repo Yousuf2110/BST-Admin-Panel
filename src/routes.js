@@ -13,6 +13,7 @@ import AddProduct from "layouts/addProduct";
 import ProductList from "layouts/productList";
 import ProductRequest from "layouts/productRequest";
 import PostTitle from "layouts/postTitle";
+import Achievements from "layouts/achievements";
 
 const routes = [
   {
@@ -118,6 +119,14 @@ const routes = [
     icon: <Icon fontSize="small">post_add</Icon>,
     route: "/alert-messages",
     component: <PostTitle />,
+  },
+  {
+    type: "collapse",
+    name: "Achievement",
+    key: "achievements",
+    icon: <Icon fontSize="small">post_add</Icon>,
+    route: "/achievements",
+    component: <Achievements />,
   },
 ];
 
