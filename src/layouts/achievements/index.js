@@ -11,21 +11,24 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
 import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 function Achievements() {
   const [rows, setRows] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedPin, setSelectedPin] = useState(null);
-  const [pinCount, setPinCount] = useState("");
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [selectedReward, setSelectedReward] = useState(null);
   const token = localStorage.getItem("authToken");
 
   const columns = [
     { Header: "Id", accessor: "id", align: "center" },
-    { Header: "User Name", accessor: "account_number", align: "center" },
-    { Header: "Amount", accessor: "amount", align: "center" },
-    { Header: "Star", accessor: "star", align: "center" },
-    { Header: "Created At", accessor: "created_at", align: "center" },
+    { Header: "User Email", accessor: "user_email", align: "center" },
+    { Header: "Bonus", accessor: "bonus", align: "center" },
+    { Header: "Status", accessor: "status", align: "center" },
     {
       Header: "Actions",
       accessor: "actions",
@@ -35,7 +38,7 @@ function Achievements() {
         return state === "PENDING" ? (
           <MDButton
             color="success"
-            onClick={() => handleApproveClick(row.original)}
+            onClick={() => handleOpenModal(row.original)}
             size="small"
             style={{ fontSize: "12px", padding: "6px 12px", marginRight: "8px" }}
           >
@@ -46,65 +49,85 @@ function Achievements() {
     },
   ];
 
-  const fetchPins = () => {
+  const fetchData = async () => {
     setLoading(true);
-    axios
-      .get("https://backend.salespronetworks.com/api/pins", {
+    try {
+      const response = await axios.get("https://backend.salespronetworks.com/api/reward-list", {
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((response) => {
-        const fetchedData = response.data.pins;
-        console.log("fetchedData", fetchedData);
-        const filteredData = fetchedData.filter((item) => item.status !== "approve");
-        const formattedRows = filteredData.map((item) => ({
-          id: item?.id || "",
-          account_number: item?.account_number || "",
-          amount: item?.amount || "",
-          star: item?.star || "",
-          payment_screenshot: (
-            <a href={item?.payment_screenshot} target="_blank" rel="noopener noreferrer">
-              View Screenshot
-            </a>
-          ),
-          user_email: item?.user_email || "",
+      });
+
+      const fetchedData = response.data.rewards;
+      console.log("Fetched Data:", fetchedData);
+
+      const formattedRows = fetchedData
+        .filter((item) => item?.status === "pending")
+        .map((item) => ({
+          id: item.id || "",
+          user_email: item.user_email || "",
+          bonus: item.bonus || "",
           status: (
             <span
               style={{
-                color:
-                  item?.status === "pending"
-                    ? "orange"
-                    : item?.status === "approved"
-                    ? "green"
-                    : "red",
+                color: "orange",
                 fontWeight: "bold",
               }}
             >
               {item?.status?.toUpperCase()}
             </span>
           ),
-          created_at: item?.created_at ? new Date(item.created_at).toLocaleString() : "N/A",
         }));
-        setRows(formattedRows);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch pins!");
-        setLoading(false);
-      });
-  };
 
-  const handleApproveClick = (pin) => {
-    setSelectedPin(pin);
-    setOpenDialog(true);
+      setRows(formattedRows);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Failed to fetch data!");
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchPins();
+    fetchData();
   }, []);
+
+  const handleOpenModal = (reward) => {
+    setSelectedReward(reward);
+    setOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelectedReward(null);
+  };
+
+  const handleConfirmApprove = async () => {
+    if (!selectedReward) return;
+    setOpen(false);
+    try {
+      const response = await axios.put(
+        `https://backend.salespronetworks.com/api/reward-list/${selectedReward.id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Reward approved successfully!");
+        fetchData();
+      } else {
+        toast.error("Failed to approve reward.");
+      }
+    } catch (error) {
+      console.error("Error approving reward:", error);
+      toast.error("Error occurred while approving reward.");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -150,6 +173,25 @@ function Achievements() {
           </Grid>
         </Grid>
       </MDBox>
+
+      <Dialog open={open} onClose={handleCloseModal}>
+        <DialogTitle>Confirm Approval</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to approve this reward for{" "}
+            <strong>{selectedReward?.user_email}</strong>?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <MDButton onClick={handleCloseModal} color="error">
+            Cancel
+          </MDButton>
+          <MDButton onClick={handleConfirmApprove} color="success">
+            Confirm
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+
       <ToastContainer />
     </DashboardLayout>
   );
