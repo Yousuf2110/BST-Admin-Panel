@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -11,7 +10,6 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -25,34 +23,56 @@ function AddProduct() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    image: null,
+    images: [], // Array to store multiple images
     accountType: "",
   });
 
+  // Handle input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "image") {
-      setFormData({ ...formData, image: e.target.files[0] });
+    const { name, value, files } = e.target;
+
+    if (name === "images") {
+      // Append new files to the existing images array
+      const newImages = Array.from(files); // Convert FileList to an array
+      setFormData((prevData) => ({
+        ...prevData,
+        images: [...prevData.images, ...newImages], // Append new files
+      }));
+
+      // Reset the file input to allow re-selection of the same files
+      e.target.value = null;
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.description || !formData.image || !formData.accountType) {
+    if (
+      !formData.name ||
+      !formData.description ||
+      formData.images.length === 0 ||
+      !formData.accountType
+    ) {
       toast.error("All fields are required.");
       return;
     }
 
     try {
       setIsLoading(true);
+
       const formDataObj = new FormData();
+      // Append text fields
       formDataObj.append("name", formData.name);
       formDataObj.append("description", formData.description);
-      formDataObj.append("image", formData.image);
       formDataObj.append("category", formData.accountType);
+
+      // Append multiple images
+      formData.images.forEach((image) => {
+        formDataObj.append("images", image); // Use the same key for multiple images
+      });
 
       const response = await axios.post(
         "https://backend.salespronetworks.com/api/add-product",
@@ -70,7 +90,7 @@ function AddProduct() {
         setFormData({
           name: "",
           description: "",
-          image: null,
+          images: [], // Reset images array
           accountType: "",
         });
       } else {
@@ -102,7 +122,6 @@ function AddProduct() {
               Add Product
             </MDTypography>
           </MDBox>
-
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -132,21 +151,31 @@ function AddProduct() {
               <Grid item xs={12}>
                 <input
                   type="file"
-                  name="image"
+                  name="images"
                   accept="image/*"
                   onChange={handleChange}
                   style={{ display: "none" }}
                   id="image-upload"
+                  multiple
                 />
                 <label htmlFor="image-upload">
                   <Button style={{ color: "gray" }} variant="outlined" component="span" fullWidth>
-                    Upload Product Image
+                    Upload Product Images
                   </Button>
                 </label>
-                {formData.image && (
-                  <MDTypography variant="body2" color="textSecondary" mt={2}>
-                    Selected File: {formData.image.name}
-                  </MDTypography>
+                {formData.images.length > 0 && (
+                  <MDBox mt={2}>
+                    <MDTypography variant="body2" color="textSecondary">
+                      Selected Files:
+                    </MDTypography>
+                    <MDBox display="flex" flexWrap="wrap" gap={1} mt={1}>
+                      {formData.images.map((image, index) => (
+                        <MDTypography key={index} variant="caption" color="textSecondary">
+                          {image.name}
+                        </MDTypography>
+                      ))}
+                    </MDBox>
+                  </MDBox>
                 )}
               </Grid>
               <Grid item xs={12}>
@@ -164,7 +193,6 @@ function AddProduct() {
                   </Select>
                 </FormControl>
               </Grid>
-
               <Grid item xs={12}>
                 <MDBox textAlign="center" mt={2}>
                   <Button
