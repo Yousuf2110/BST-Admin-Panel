@@ -151,7 +151,7 @@ function ProductList() {
           {filteredProducts?.map((product) => (
             <Grid item xs={12} sm={6} md={4} key={product.id}>
               <Card>
-                <CardMedia component="img" height="150" image={product.image} alt={product.name} />
+                <CardMedia component="img" height="150" image={product?.image?.[0]} alt={product.name} />
                 <CardContent>
                   <Typography variant="h6" fontWeight="bold">
                     {product.name}

@@ -32,14 +32,11 @@ function AddProduct() {
     const { name, value, files } = e.target;
 
     if (name === "images") {
-      // Append new files to the existing images array
       const newImages = Array.from(files); // Convert FileList to an array
       setFormData((prevData) => ({
         ...prevData,
         images: [...prevData.images, ...newImages], // Append new files
       }));
-
-      // Reset the file input to allow re-selection of the same files
       e.target.value = null;
     } else {
       setFormData({ ...formData, [name]: value });
@@ -64,14 +61,12 @@ function AddProduct() {
       setIsLoading(true);
 
       const formDataObj = new FormData();
-      // Append text fields
       formDataObj.append("name", formData.name);
       formDataObj.append("description", formData.description);
       formDataObj.append("category", formData.accountType);
 
-      // Append multiple images
       formData.images.forEach((image) => {
-        formDataObj.append("images", image); // Use the same key for multiple images
+        formDataObj.append("images[]", image);
       });
 
       const response = await axios.post(
@@ -90,7 +85,7 @@ function AddProduct() {
         setFormData({
           name: "",
           description: "",
-          images: [], // Reset images array
+          images: [],
           accountType: "",
         });
       } else {
