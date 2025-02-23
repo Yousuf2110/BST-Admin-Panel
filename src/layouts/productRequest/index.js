@@ -27,6 +27,7 @@ function ProductRequest() {
       { Header: "ID", accessor: "product_id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
       { Header: "Mobile", accessor: "phone", align: "center" },
+      { Header: "Address", accessor: "address", align: "center" },
       { Header: "View ScreenShot", accessor: "payment_screenshot", align: "center" },
       { Header: "Product Name", accessor: "product_name", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
@@ -97,6 +98,7 @@ function ProductRequest() {
         product_id: item.product_id || "N/A",
         user_email: item?.user_email || "N/A",
         phone: item?.phone || "N/A",
+        address: item?.address || "N/A",
         payment_screenshot: item.payment_screenshot ? (
           <a href={item.payment_screenshot} target="_blank" rel="noopener noreferrer">
             <button
