@@ -25,6 +25,7 @@ function ProductRequest() {
   const [tableData, setTableData] = useState({
     columns: [
       { Header: "ID", accessor: "product_id", align: "left" },
+      { Header: "Name", accessor: "name", align: "center" },
       { Header: "Email", accessor: "user_email", align: "center" },
       { Header: "Mobile", accessor: "phone", align: "center" },
       { Header: "Address", accessor: "address", align: "center" },
@@ -71,7 +72,7 @@ function ProductRequest() {
 
       if (response.data) {
         toast.success("Status updated successfully!");
-        fetchData(); // Refresh the table data
+        fetchData();
       } else {
         toast.error("Failed to update status. Please try again.");
       }
@@ -95,6 +96,7 @@ function ProductRequest() {
       );
 
       const formattedData = response.data?.requests?.map((item) => ({
+        name: item.name || "N/A",
         product_id: item.product_id || "N/A",
         user_email: item?.user_email || "N/A",
         phone: item?.phone || "N/A",
