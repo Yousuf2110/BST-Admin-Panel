@@ -91,7 +91,7 @@ function WithDrawList() {
                 {item.status?.toUpperCase()}
               </MDTypography>
             ),
-            created_at: formatDate(item?.user?.created_at),
+            created_at: formatDate(item?.user?.updatedAt),
             actions: item.status === "pending" && (
               <button
                 style={{
