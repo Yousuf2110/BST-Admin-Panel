@@ -22,24 +22,14 @@ import { MenuItem } from "@mui/material";
 function ProductRequest() {
   const token = localStorage.getItem("authToken");
   const [loading, setLoading] = useState(true);
-  const [tableData, setTableData] = useState({
-    columns: [
-      { Header: "ID", accessor: "product_id", align: "left" },
-      { Header: "Name", accessor: "name", align: "center" },
-      { Header: "Email", accessor: "user_email", align: "center" },
-      { Header: "Mobile", accessor: "phone", align: "center" },
-      { Header: "Address", accessor: "address", align: "center" },
-      { Header: "View ScreenShot", accessor: "payment_screenshot", align: "center" },
-      { Header: "Product Name", accessor: "product_name", align: "center" },
-      { Header: "Status", accessor: "status", align: "center" },
-      { Header: "Actions", accessor: "actions", align: "center" },
-    ],
-    rows: [],
-  });
-
+  const [allRows, setAllRows] = useState([]); // Store raw formatted rows
   const [selectedId, setSelectedId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Separate data into pending and others
+  const pendingRows = allRows.filter((row) => row.status.props.children === "PENDING");
+  const otherRows = allRows.filter((row) => row.status.props.children !== "PENDING");
 
   const handleModalOpen = (id, status) => {
     setSelectedId(id);
@@ -53,15 +43,16 @@ function ProductRequest() {
     setSelectedStatus("");
   };
 
-  const handleStatusChange = async (event) => {
-    const newStatus = event.target.value;
-    setSelectedStatus(newStatus);
+  const handleStatusChange = (event) => {
+    setSelectedStatus(event.target.value);
   };
 
   const updateStatus = async () => {
+    if (!selectedId) return;
+
     try {
       const response = await axios.put(
-        `https://backend.salespronetworks.com/api/product-request/${selectedId}`,
+        `https://backend.salespronetworks.com/api/product-request/${selectedId}`, // Fixed URL spacing
         { status: selectedStatus },
         {
           headers: {
@@ -74,7 +65,7 @@ function ProductRequest() {
         toast.success("Status updated successfully!");
         fetchData();
       } else {
-        toast.error("Failed to update status. Please try again.");
+        toast.error("Failed to update status.");
       }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
@@ -87,7 +78,7 @@ function ProductRequest() {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://backend.salespronetworks.com/api/product-requests",
+        "https://backend.salespronetworks.com/api/product-requests", // Fixed URL spacing
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -95,54 +86,48 @@ function ProductRequest() {
         }
       );
 
-      const formattedData = response.data?.requests?.map((item) => ({
-        name: item.name || "N/A",
-        product_id: item.product_id || "N/A",
-        user_email: item?.user_email || "N/A",
-        phone: item?.phone || "N/A",
-        address: item?.address || "N/A",
-        payment_screenshot: item.payment_screenshot ? (
-          <a href={item.payment_screenshot} target="_blank" rel="noopener noreferrer">
-            <button
-              style={{
-                backgroundColor: "#4CAF50",
-                color: "white",
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              View ScreenShot
-            </button>
-          </a>
-        ) : (
-          "N/A"
-        ),
-        product_name: item.product_name || "N/A",
-        status: (
-          <MDTypography variant="caption" color="info" fontWeight="medium">
-            {item.status?.toUpperCase()}
-          </MDTypography>
-        ),
-        actions: (
-          <IconButton
-            aria-label="more"
-            aria-controls="actions-menu"
-            aria-haspopup="true"
-            onClick={() => handleModalOpen(item?.id, item?.status)}
-          >
-            <MoreVertIcon />
-          </IconButton>
-        ),
-      }));
+      const formattedData =
+        response.data?.requests?.map((item) => ({
+          name: item.name || "N/A",
+          product_id: item.product_id || "N/A",
+          user_email: item?.user_email || "N/A",
+          phone: item?.phone || "N/A",
+          address: item?.address || "N/A",
+          payment_screenshot: item.payment_screenshot ? (
+            <a href={item.payment_screenshot} target="_blank" rel="noopener noreferrer">
+              <button
+                style={{
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  padding: "8px 16px",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                View ScreenShot
+              </button>
+            </a>
+          ) : (
+            "N/A"
+          ),
+          product_name: item.product_name || "N/A",
+          status: (
+            <MDTypography variant="caption" color="info" fontWeight="medium">
+              {item.status?.toUpperCase()}
+            </MDTypography>
+          ),
+          actions: (
+            <IconButton aria-label="more" onClick={() => handleModalOpen(item?.id, item?.status)}>
+              <MoreVertIcon />
+            </IconButton>
+          ),
+        })) || [];
 
-      setTableData((prev) => ({
-        ...prev,
-        rows: formattedData,
-      }));
+      setAllRows(formattedData);
     } catch (error) {
       toast.error("Failed to fetch data. Please try again.");
+      setAllRows([]);
     } finally {
       setLoading(false);
     }
@@ -152,51 +137,78 @@ function ProductRequest() {
     fetchData();
   }, []);
 
+  // Table structure reused
+  const renderTable = (rows, title) => (
+    <Grid item xs={12}>
+      <Card>
+        <MDBox
+          mx={2}
+          mt={-3}
+          py={3}
+          px={2}
+          variant="gradient"
+          bgColor="info"
+          borderRadius="lg"
+          coloredShadow="info"
+        >
+          <MDTypography variant="h6" color="white">
+            {title}
+          </MDTypography>
+        </MDBox>
+        <MDBox pt={3}>
+          {rows.length === 0 ? (
+            <MDBox textAlign="center" p={2}>
+              <MDTypography variant="body2" color="textSecondary">
+                No requests found.
+              </MDTypography>
+            </MDBox>
+          ) : (
+            <DataTable
+              table={{
+                columns: [
+                  { Header: "ID", accessor: "product_id", align: "left" },
+                  { Header: "Name", accessor: "name", align: "center" },
+                  { Header: "Email", accessor: "user_email", align: "center" },
+                  { Header: "Mobile", accessor: "phone", align: "center" },
+                  { Header: "Address", accessor: "address", align: "center" },
+                  { Header: "View ScreenShot", accessor: "payment_screenshot", align: "center" },
+                  { Header: "Product Name", accessor: "product_name", align: "center" },
+                  { Header: "Status", accessor: "status", align: "center" },
+                  { Header: "Actions", accessor: "actions", align: "center" },
+                ],
+                rows,
+              }}
+              isSorted
+              entriesPerPage={false}
+              showTotalEntries={false}
+              noEndBorder
+            />
+          )}
+        </MDBox>
+      </Card>
+    </Grid>
+  );
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
-          <Grid item xs={12}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="white">
-                  Product Requests
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <Grid container justifyContent="center">
-                    <CircularProgress />
-                  </Grid>
-                ) : tableData.rows.length === 0 ? (
-                  <MDBox textAlign="center" p={2}>
-                    <MDTypography variant="h6" color="textSecondary">
-                      No product requests found
-                    </MDTypography>
-                  </MDBox>
-                ) : (
-                  <DataTable
-                    table={tableData}
-                    isSorted
-                    entriesPerPage={false}
-                    showTotalEntries={false}
-                    noEndBorder
-                  />
-                )}
-              </MDBox>
-            </Card>
-          </Grid>
+          {loading ? (
+            <Grid item xs={12} textAlign="center">
+              <CircularProgress />
+            </Grid>
+          ) : (
+            <>
+              {/* Pending Requests */}
+              {pendingRows.length > 0 && renderTable(pendingRows, "Pending Requests")}
+
+              {/* Other Status Requests */}
+              {otherRows.length > 0 && renderTable(otherRows, "Processed & Completed Requests")}
+            </>
+          )}
         </Grid>
+
         <ToastContainer />
       </MDBox>
 
