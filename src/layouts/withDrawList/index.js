@@ -75,74 +75,79 @@ function WithDrawList() {
 
       console.log("withdrawalsGt2", withdrawalsLte2);
 
+      // Sort withdrawals by amount in descending order (highest first)
+      const sortedWithdrawalsGt2 = withdrawalsGt2
+        .filter((item) => item.status !== "approved")
+        .sort((a, b) => parseFloat(b.total_amount) - parseFloat(a.total_amount));
+
+      const sortedWithdrawalsLte2 = withdrawalsLte2
+        .filter((item) => item.status !== "approved")
+        .sort((a, b) => parseFloat(b.total_amount) - parseFloat(a.total_amount));
+
       setTableDataGt2((prev) => ({
         ...prev,
-        rows: withdrawalsGt2
-          .filter((item) => item.status !== "approved")
-          .map((item, i) => ({
-            id: i + 1 || "N/A",
-            user_email: item.user?.email || "N/A",
-            mobile: item.user?.mobile || "N/A",
-            account_title: item.user?.account_title || "N/A",
-            bank: item.user?.bank || "N/A",
-            amount: parseFloat(item.total_amount).toString().replace(/\.00$/, "") || "0",
-            status: (
-              <MDTypography variant="caption" color="info" fontWeight="medium">
-                {item.status?.toUpperCase()}
-              </MDTypography>
-            ),
-            created_at: formatDate(item?.user?.updatedAt),
-            actions: item.status === "pending" && (
-              <button
-                style={{
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  padding: "8px 16px",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleApprove(item?.ids)}
-              >
-                Approve
-              </button>
-            ),
-          })),
+        rows: sortedWithdrawalsGt2.map((item, i) => ({
+          id: i + 1 || "N/A",
+          user_email: item.user?.email || "N/A",
+          mobile: item.user?.mobile || "N/A",
+          account_title: item.user?.account_title || "N/A",
+          bank: item.user?.bank || "N/A",
+          amount: parseFloat(item.total_amount).toString().replace(/\.00$/, "") || "0",
+          status: (
+            <MDTypography variant="caption" color="info" fontWeight="medium">
+              {item.status?.toUpperCase()}
+            </MDTypography>
+          ),
+          created_at: formatDate(item?.user?.updatedAt),
+          actions: item.status === "pending" && (
+            <button
+              style={{
+                backgroundColor: "#4CAF50",
+                color: "white",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+              onClick={() => handleApprove(item?.ids)}
+            >
+              Approve
+            </button>
+          ),
+        })),
       }));
 
       setTableDataLte2((prev) => ({
         ...prev,
-        rows: withdrawalsLte2
-          .filter((item) => item.status !== "approved")
-          .map((item, i) => ({
-            id: i + 1 || "N/A",
-            user_email: item.user?.email || "N/A",
-            mobile: item.user?.mobile || "N/A",
-            account_title: item.user?.account_title || "N/A",
-            bank: item.user?.bank || "N/A",
-            amount: parseFloat(item.total_amount).toString().replace(/\.00$/, "") || "0",
-            status: (
-              <MDTypography variant="caption" color="info" fontWeight="medium">
-                {item.status?.toUpperCase()}
-              </MDTypography>
-            ),
-            created_at: formatDate(item.created_at),
-            actions: item.status === "pending" && (
-              <button
-                style={{
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  padding: "8px 16px",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleApprove(item?.ids)}
-              >
-                Approve
-              </button>
-            ),
-          })),
+        rows: sortedWithdrawalsLte2.map((item, i) => ({
+          id: i + 1 || "N/A",
+          user_email: item.user?.email || "N/A",
+          mobile: item.user?.mobile || "N/A",
+          account_title: item.user?.account_title || "N/A",
+          bank: item.user?.bank || "N/A",
+          amount: parseFloat(item.total_amount).toString().replace(/\.00$/, "") || "0",
+          status: (
+            <MDTypography variant="caption" color="info" fontWeight="medium">
+              {item.status?.toUpperCase()}
+            </MDTypography>
+          ),
+          created_at: formatDate(item.created_at),
+          actions: item.status === "pending" && (
+            <button
+              style={{
+                backgroundColor: "#4CAF50",
+                color: "white",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+              onClick={() => handleApprove(item?.ids)}
+            >
+              Approve
+            </button>
+          ),
+        })),
       }));
     } catch (error) {
       toast.error("Failed to fetch data. Please try again.");
