@@ -14,6 +14,8 @@ import ProductList from "layouts/productList";
 import ProductRequest from "layouts/productRequest";
 import PostTitle from "layouts/postTitle";
 import Achievements from "layouts/achievements";
+import ECommerceProductRequest from "layouts/ecommerceproductsRequest";
+import ProductCard from "layouts/ecommerceproducts";
 
 const routes = [
   {
@@ -128,6 +130,22 @@ const routes = [
     route: "/achievements",
     component: <Achievements />,
   },
+    {
+      type: "collapse",
+      name: "E-Commerce",
+      key: "e-commerce",
+      icon: <Icon fontSize="small">shopping_cart</Icon>,
+      route: "/e-commerce",
+      component: <ProductCard />,
+    },
+    {
+      type: "collapse",
+      name: "Request E-Commerce",
+      key: "request-e-commerce",
+      icon: <Icon fontSize="small">shopping_cart</Icon>,
+      route: "/request-e-commerce",
+      component: <ECommerceProductRequest />,
+    },
 ];
 
 export default routes;
