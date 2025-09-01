@@ -20,6 +20,7 @@ function ECommerceProductRequest() {
       product_id: "1001",
       user_email: "ali@gmail.com",
       phone: "+92 300 1234567",
+      address: "House #123, Street 5, Gulberg, Lahore",
       payment_screenshot: (
         <a href="#screenshot1" target="_blank" rel="noopener noreferrer">
           <button
@@ -48,6 +49,7 @@ function ECommerceProductRequest() {
       product_id: "1002",
       user_email: "sana@yahoo.com",
       phone: "+92 311 2345678",
+      address: "Flat #402, Block C, DHA Phase 5, Karachi",
       payment_screenshot: (
         <a href="#screenshot2" target="_blank" rel="noopener noreferrer">
           <button
@@ -76,6 +78,7 @@ function ECommerceProductRequest() {
       product_id: "1003",
       user_email: "usman@outlook.com",
       phone: "+92 322 3456789",
+      address: "Shop #25, Main Bazaar, Islamabad",
       payment_screenshot: "N/A",
       product_name: "Bluetooth Speaker",
       status: (
@@ -88,6 +91,7 @@ function ECommerceProductRequest() {
       product_id: "1004",
       user_email: "zara@gmail.com",
       phone: "+92 333 4567890",
+      address: "House #78, Street 9, Bahria Town, Rawalpindi",
       payment_screenshot: (
         <a href="#screenshot4" target="_blank" rel="noopener noreferrer">
           <button
@@ -116,6 +120,7 @@ function ECommerceProductRequest() {
       product_id: "1007",
       user_email: "tariq@gmail.com",
       phone: "+92 366 7890123",
+      address: "Office #15, 2nd Floor, Blue Area, Islamabad",
       payment_screenshot: (
         <a href="#screenshot7" target="_blank" rel="noopener noreferrer">
           <button
@@ -147,6 +152,7 @@ function ECommerceProductRequest() {
     {
       id: "WDR001",
       user_email: "ali@gmail.com",
+      address: "House #123, Street 5, Gulberg, Lahore",
       method: "Bank Transfer",
       amount: "$250.00",
       status: (
@@ -159,6 +165,7 @@ function ECommerceProductRequest() {
     {
       id: "WDR002",
       user_email: "sana@yahoo.com",
+      address: "Flat #402, Block C, DHA Phase 5, Karachi",
       method: "JazzCash",
       amount: "$180.50",
       status: (
@@ -171,6 +178,7 @@ function ECommerceProductRequest() {
     {
       id: "WDR003",
       user_email: "usman@outlook.com",
+      address: "Shop #25, Main Bazaar, Islamabad",
       method: "EasyPaisa",
       amount: "$300.00",
       status: (
@@ -183,6 +191,7 @@ function ECommerceProductRequest() {
     {
       id: "WDR004",
       user_email: "zara@gmail.com",
+      address: "House #78, Street 9, Bahria Town, Rawalpindi",
       method: "Bank Transfer",
       amount: "$500.00",
       status: (
@@ -195,6 +204,7 @@ function ECommerceProductRequest() {
     {
       id: "WDR005",
       user_email: "fahad@gmail.com",
+      address: "Office #15, 2nd Floor, Blue Area, Islamabad",
       method: "PayPal",
       amount: "$120.75",
       status: (
@@ -212,6 +222,7 @@ function ECommerceProductRequest() {
       { Header: "ID", accessor: "product_id", align: "left" },
       { Header: "Email", accessor: "user_email", align: "center" },
       { Header: "Mobile", accessor: "phone", align: "center" },
+      { Header: "Address", accessor: "address", align: "center" },
       { Header: "Screenshot", accessor: "payment_screenshot", align: "center" },
       { Header: "Product Name", accessor: "product_name", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
@@ -224,6 +235,7 @@ function ECommerceProductRequest() {
     columns: [
       { Header: "Withdraw ID", accessor: "id", align: "left" },
       { Header: "User Email", accessor: "user_email", align: "center" },
+      { Header: "Address", accessor: "address", align: "center" },
       { Header: "Method", accessor: "method", align: "center" },
       { Header: "Amount", accessor: "amount", align: "center" },
       { Header: "Status", accessor: "status", align: "center" },
